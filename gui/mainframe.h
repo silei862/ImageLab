@@ -1,5 +1,5 @@
 // File		: mainframe.h
-// Author	: silei
+// Author	: Silei
 // Descr	: MainFrame header
 
 #ifndef MAINFRAME_H
@@ -39,6 +39,7 @@ class MainFrame : public wxFrame {
 	const static wxString APP_NAME;
 	const static wxString KEY_CUR_DIR;
 	const static wxString KEY_PERSPECTIVE;
+
 public:
 	MainFrame(wxWindow *parent, wxWindowID id, const wxString &title,
 			const wxPoint &pos = wxDefaultPosition,
@@ -86,6 +87,7 @@ private:
 	wxGenericDirCtrl *dir_ctrl;
     Gallery *gallery;
 	ProgressBar *progress_bar;
+
 	wxConfig *configs;
 	wxString cur_dir;
 	wxString cur_file;

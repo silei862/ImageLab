@@ -1,3 +1,7 @@
+// File   : cvbridge.cpp
+// Author : Silei
+// Descr  : Provide convert between OpenCV mat and wxImage
+
 #include "cvbridge.h"
 #include <iostream>
 

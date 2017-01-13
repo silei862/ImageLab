@@ -1,3 +1,8 @@
+// File		: imagecanvas.cpp
+// Author	: Silei
+// Descr	: Display a image support zoom and drag
+
+
 #include "imagecanvas.h"
 #include <iostream>
 
@@ -152,34 +157,34 @@ void ImageCanvas::Render(wxPaintDC &dc) {
 }
 
 void ImageCanvas::OnMouseWheel(wxMouseEvent &event) {
-  // TODO:Eliminate image position while zoom with mouse wheel
-  int rot = event.GetWheelRotation();
-  if (rot > 0)
-    ZoomOut();
-  else
-    ZoomIn();
-  int x = event.GetX();
-  int y = event.GetY();
-  UpdateCanvas(x, y);
-  event.Skip();
+    // TODO:Eliminate image position while zoom with mouse wheel
+    int rot = event.GetWheelRotation();
+    if (rot > 0)
+        ZoomOut();
+    else
+        ZoomIn();
+    int x = event.GetX();
+    int y = event.GetY();
+    UpdateCanvas(x, y);
+    event.Skip();
 }
 
 void ImageCanvas::OnMouseLeftDown(wxMouseEvent &event) {
-  // preserve position of mouse
-  mousePos.x = event.GetX();
-  mousePos.y = event.GetY();
-  scrollPos.x = GetScrollPos(wxHORIZONTAL);
-  scrollPos.y = GetScrollPos(wxVERTICAL);
-  event.Skip();
+    // preserve position of mouse
+    mousePos.x = event.GetX();
+    mousePos.y = event.GetY();
+    scrollPos.x = GetScrollPos(wxHORIZONTAL);
+    scrollPos.y = GetScrollPos(wxVERTICAL);
+    event.Skip();
 }
 
 void ImageCanvas::OnMouseMotion(wxMouseEvent &event) {
-  if (event.Dragging()) {
-    int x, y, scx, scy;
-    x = event.GetX();
-    y = event.GetY();
-    scx = scrollPos.x - x + mousePos.x;
-    scy = scrollPos.y - y + mousePos.y;
-    Scroll(scx, scy);
-  }
+    if (event.Dragging()) {
+        int x, y, scx, scy;
+        x = event.GetX();
+        y = event.GetY();
+        scx = scrollPos.x - x + mousePos.x;
+        scy = scrollPos.y - y + mousePos.y;
+        Scroll(scx, scy);
+    }
 }

@@ -1,6 +1,6 @@
 // File   : transqueue.h
 // Author : Silei
-// Descr  : Provide thread safe data transfer
+// Descr  : Simple class template provide thread safe data transfer
 
 #ifndef TRANSQUEUE_H
 #define TRANSQUEUE_H

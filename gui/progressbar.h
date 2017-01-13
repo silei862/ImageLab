@@ -1,3 +1,8 @@
+// File		: progressbar.h
+// Author	: Silei
+// Descr	: Provide progress indicator
+
+
 #ifndef PROGRESSBAR_H
 #define PROGRESSBAR_H
 
@@ -17,12 +22,13 @@ private:
 	const static wxString default_format;
 
 public:
-	ProgressBar(wxWindow *parent, wxWindowID id = wxID_ANY,
-			const wxPoint &pos = wxDefaultPosition,
-			const wxSize &size = wxDefaultSize,
-			long style = wxFULL_REPAINT_ON_RESIZE | wxBORDER_NONE,
-			const wxValidator &validator = wxDefaultValidator,
-			const wxString &name = wxControlNameStr);
+    ProgressBar(wxWindow *parent, wxWindowID id = wxID_ANY,
+                const wxPoint &pos = wxDefaultPosition,
+                const wxSize &size = wxDefaultSize,
+                long style = wxFULL_REPAINT_ON_RESIZE | wxBORDER_NONE,
+                const wxValidator &validator = wxDefaultValidator,
+                const wxString &name = wxControlNameStr);
+
 	~ProgressBar();
 
 	wxSize DoGetBestSize() const;
