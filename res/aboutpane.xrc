@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+	<object class="wxPanel" name="AboutPane">
+		<style>wxTAB_TRAVERSAL</style>
+		<size>300,500</size>
+		<object class="wxBoxSizer">
+			<orient>wxVERTICAL</orient>
+			<object class="spacer">
+				<option>1</option>
+				<flag>wxEXPAND</flag>
+				<border>5</border>
+				<size>0,0</size>
+			</object>
+			<object class="sizeritem">
+				<option>1</option>
+				<flag>wxALIGN_CENTER|wxALL</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="m_staticText">
+					<font>
+						<size>20</size>
+						<style>normal</style>
+						<weight>bold</weight>
+						<underlined>0</underlined>
+					</font>
+					<label>PixeLab</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>1</option>
+				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="m_staticText4">
+					<font>
+						<style>italic</style>
+						<weight>normal</weight>
+						<underlined>0</underlined>
+					</font>
+					<label>A wxWidgets _ OpenCV combination test.</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxALIGN_CENTER|wxALL</flag>
+				<border>10</border>
+				<object class="wxStaticText" name="m_staticText5">
+					<label>Author : SiLei</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxALIGN_CENTER|wxALL</flag>
+				<border>5</border>
+				<object class="wxHyperlinkCtrl" name="m_hyperlink1">
+					<label>silei862@gmail.com</label>
+					<url>mailto:silei862@gmail.com</url>
+					<style>wxHL_DEFAULT_STYLE</style>
+				</object>
+			</object>
+			<object class="spacer">
+				<option>1</option>
+				<flag>wxEXPAND</flag>
+				<border>5</border>
+				<size>0,0</size>
+			</object>
+		</object>
+	</object>
+</resource>

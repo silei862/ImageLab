@@ -4,7 +4,6 @@
 
 
 #include "imagecanvas.h"
-#include <iostream>
 
 ImageCanvas::ImageCanvas(wxWindow *parent,
                          wxWindowID id,

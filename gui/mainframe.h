@@ -8,12 +8,16 @@
 //#include "wx_pch.h"
 #include <wx/wx.h>
 #include <wx/aui/aui.h>
+#include <wx/choicebk.h>
 #include <wx/dirctrl.h>
 #include <wx/filefn.h>
 #include <wx/config.h>
 #include "progressbar.h"
 #include "imagecanvas.h"
 #include "gallery.h"
+#include "plugin.h"
+
+class wxDynamicLibrary;
 
 class MainFrame : public wxFrame {
 	enum _IDS {
@@ -26,8 +30,6 @@ class MainFrame : public wxFrame {
 		ID_ZOOMOUT,
 		ID_ZOOMIN,
 		ID_FITWIN,
-
-        ID_GRAYLIZE,
 
 		ID_DIRCTRL,
         ID_GALLERY,
@@ -68,27 +70,31 @@ public:
 	void OnZoomIn(wxCommandEvent &event);
 	void OnFitWin(wxCommandEvent &event);
 
-    void OnGraylize(wxCommandEvent &event);
-
 	void OnFileActived(wxTreeEvent &event);
     void OnDirChanged(wxTreeEvent &event);
     void OnImageClicked(wxCommandEvent &event);
     void OnGalleryProgress(wxCommandEvent &event);
     void OnGalleryComplete(wxCommandEvent &event);
 
+    void OnImageRequest(wxCommandEvent &event);
+    void OnImageUpdate(plugImageEvent &event);
+
 //------------------------------------------------------------------
 private:
 	void UpdateInfo(bool update_tree=true);
+
 //------------------------------------------------------------------
 private:
 	wxAuiManager mgr;
     wxAuiToolBar *toolbar_file;
-    wxAuiNotebook *notebook;
+    wxAuiNotebook *imagebook;
+    wxChoicebook *toolbook;
 	wxGenericDirCtrl *dir_ctrl;
     Gallery *gallery;
 	ProgressBar *progress_bar;
 
 	wxConfig *configs;
+    Plugin *plugin;
 	wxString cur_dir;
 	wxString cur_file;
 	wxString perspective;

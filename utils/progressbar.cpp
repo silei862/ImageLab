@@ -4,7 +4,11 @@
 
 #include "progressbar.h"
 
-const wxDouble ProgressBar::default_value       = 0.2;
+wxDEFINE_EVENT(progrEVT_START, wxCommandEvent);
+wxDEFINE_EVENT(progrEVT_UPDATE, wxCommandEvent);
+wxDEFINE_EVENT(progrEVT_COMPLETE, wxCommandEvent);
+
+const wxDouble ProgressBar::default_value       = 0.0;
 const wxString ProgressBar::default_format      = _ ( "%.1f%%" );
 
 ProgressBar::ProgressBar ( wxWindow *parent, wxWindowID id, const wxPoint &pos,
@@ -12,6 +16,8 @@ ProgressBar::ProgressBar ( wxWindow *parent, wxWindowID id, const wxPoint &pos,
                            const wxValidator &validator, const wxString &name )
     :wxControl ( parent, id, pos, size, style, validator, name ),
     value ( ProgressBar::default_value ),
+    progress_num(0),
+    max_num(DEF_MAX_NUM),
     front_pen ( wxPen ( wxColour ( 10, 10, 10 ), 2 ) ),
     back_pen ( wxPen ( wxColour ( 0, 10, 10 ), 1 ) ),
     front_brush ( wxBrush ( wxColour ( 120, 120, 120 ), wxBRUSHSTYLE_BDIAGONAL_HATCH ) ),
@@ -24,6 +30,10 @@ ProgressBar::ProgressBar ( wxWindow *parent, wxWindowID id, const wxPoint &pos,
     SetBackgroundColour ( back_colour );
     //绑定事件处理器：
     Bind ( wxEVT_PAINT, &ProgressBar::OnPaint, this );
+
+    Bind (progrEVT_START, &ProgressBar::OnStart, this);
+    Bind (progrEVT_UPDATE, &ProgressBar::OnUpdate, this);
+    Bind (progrEVT_COMPLETE, &ProgressBar::OnComplete, this);
 }
 
 ProgressBar::~ProgressBar() {}
@@ -69,4 +79,23 @@ void ProgressBar::OnPaint ( wxPaintEvent &event ) {
     dc.SetFont ( font );
     dc.SetTextForeground ( font_colour );
     dc.DrawText ( ps, w / 2 - FONT_SIZE, ( h - FONT_SIZE ) / 2 );
+}
+
+void ProgressBar::OnStart(wxCommandEvent &event) {
+    SetValue(0.0);
+    progress_num = 0;
+    max_num = event.GetExtraLong();
+    Refresh();
+}
+
+void ProgressBar::OnUpdate(wxCommandEvent &event) {
+    progress_num++;
+    progress_num = (progress_num <= max_num) ? progress_num : max_num;
+    SetValue(wxDouble(progress_num)/wxDouble(max_num));
+    Refresh();
+}
+
+void ProgressBar::OnComplete(wxCommandEvent &event) {
+    SetValue(1.0);
+    Refresh();
 }

@@ -7,12 +7,14 @@
 #include <wx/artprov.h>
 #include <wx/filedlg.h>
 #include <wx/filename.h>
+#include <wx/xrc/xmlres.h>
 #include <wx/dir.h>
+#include <wx/dynlib.h>
 
 #include "mainframe.h"
 #include "imagecanvas.h"
 #include "progressbar.h"
-#include "utility.h"
+#include "plugin.h"
 
 const wxString MainFrame::APP_NAME        = _ ( "ImageLab" );
 const wxString MainFrame::KEY_CUR_DIR     = _ ( "CurrentDir" );
@@ -22,6 +24,7 @@ MainFrame::MainFrame ( wxWindow *parent, wxWindowID id, const wxString &title,
                        const wxPoint &pos, const wxSize &size, long style,
                        const wxString &name )
     :wxFrame ( parent, id, title, pos, size, style, name ),
+      plugin(nullptr),
       image_changed ( false ) {
 
     LoadConfigs();
@@ -79,15 +82,6 @@ inline void MainFrame::InitMenubar() {
 }
 
 inline void MainFrame::InitToolbar() {
-//------------- Toolbar Processor ---------------------------
-    wxAuiToolBar *toolbar_proc = new wxAuiToolBar(this, wxID_ANY,
-                                                  wxDefaultPosition, wxDefaultSize, wxAUI_TBTOOL_TEXT_BOTTOM);
-    toolbar_proc->AddTool( ID_GRAYLIZE, _("Graylize"),
-                           wxArtProvider::GetBitmap(wxART_HELP),
-                           _("Make the Image Gray"));
-
-    toolbar_proc->Realize();
-    mgr.AddPane(toolbar_proc, wxAuiPaneInfo().Name("ToolBarImageProc").ToolbarPane().Top().Dockable());
 
 //------------- Toolbar View --------------------------------
     wxAuiToolBar *toolbar_view = new wxAuiToolBar ( this, wxID_ANY,
@@ -137,8 +131,28 @@ inline void MainFrame::InitToolbar() {
 }
 
 inline void MainFrame::InitPanes() {
-    notebook = new wxAuiNotebook(this, wxID_ANY);
-    mgr.AddPane(notebook, wxAuiPaneInfo().Name("Notebook").CenterPane().CloseButton(false).PaneBorder(false));
+    imagebook = new wxAuiNotebook(this, wxID_ANY);
+    mgr.AddPane(imagebook, wxAuiPaneInfo().Name("Imagebook").CenterPane().Floatable());
+
+    toolbook = new wxChoicebook(this, wxID_ANY);
+    wxPanel *about_pane = wxXmlResource::Get()->LoadPanel(toolbook,"AboutPane");
+    toolbook->AddPage(about_pane,"About", true);
+
+//////!!!!! Test Code !!!!!!////
+    wxDynamicLibrary loader;
+    loader.Load("./graylize.so");
+    if(loader.IsLoaded()){
+        wxDYNLIB_FUNCTION(PluginCreator, CreatePlugin, loader);
+        if(pfnCreatePlugin) {
+            loader.Detach();
+            plugin = (pfnCreatePlugin)(this->GetEventHandler());
+            wxWindow *gpane = plugin->GetWindow(toolbook, wxID_ANY);
+            toolbook->AddPage(gpane, plugin->GetPluginName(), true);
+        }
+    }
+////////////////////////////////
+
+    mgr.AddPane(toolbook, wxAuiPaneInfo().Name("Toolbook").Right().CloseButton(false).MinSize(300,600));
 
     gallery = new Gallery ( this, ID_GALLERY );
     mgr.AddPane ( gallery, wxAuiPaneInfo().Name ( "Gallery" ).Left().CloseButton ( false ).MinSize ( wxSize ( 200,200 ) ) );
@@ -154,6 +168,7 @@ inline void MainFrame::InitPanes() {
 }
 
 inline void MainFrame::BindEvtProc() {
+
     Bind ( wxEVT_COMMAND_TOOL_CLICKED     , &MainFrame::OnExit        , this , ID_EXIT );
     Bind ( wxEVT_COMMAND_TOOL_CLICKED     , &MainFrame::OnHelp        , this , ID_HELP );
     Bind ( wxEVT_COMMAND_TOOL_CLICKED     , &MainFrame::OnFileOpen    , this , ID_FILEOPEN );
@@ -164,14 +179,15 @@ inline void MainFrame::BindEvtProc() {
     Bind ( wxEVT_COMMAND_TOOL_CLICKED , &MainFrame::OnZoomIn  , this , ID_ZOOMIN );
     Bind ( wxEVT_COMMAND_TOOL_CLICKED , &MainFrame::OnFitWin  , this , ID_FITWIN );
 
-    Bind (wxEVT_COMMAND_TOOL_CLICKED , &MainFrame::OnGraylize, this , ID_GRAYLIZE);
-
     Bind ( wxEVT_DIRCTRL_FILEACTIVATED    , &MainFrame::OnFileActived , this , ID_DIRCTRL );
     Bind ( wxEVT_DIRCTRL_SELECTIONCHANGED , &MainFrame::OnDirChanged  , this , ID_DIRCTRL );
 
     Bind ( wxEVT_LISTBOX_DCLICK  , &MainFrame::OnImageClicked   , this, ID_GALLERY );
     Bind ( pxEVT_GALLERY_PROGRESS, &MainFrame::OnGalleryProgress, this, ID_GALLERY );
     Bind ( pxEVT_GALLERY_COMPLETE, &MainFrame::OnGalleryComplete, this, ID_GALLERY );
+
+    Bind ( plugEVT_IMAGE_REQUEST, &MainFrame::OnImageRequest, this);
+    Bind ( plugEVT_IMAGE, &MainFrame::OnImageUpdate, this);
 }
 
 inline void MainFrame::LoadConfigs() {
@@ -199,7 +215,7 @@ void MainFrame::OnExit ( wxCommandEvent &event ) {
 }
 
 void MainFrame::OnZoomOut ( wxCommandEvent &event ) {
-    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(notebook->GetCurrentPage());
+    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
     if(canvas){
         canvas->ZoomOut();
         canvas->UpdateCanvas();
@@ -207,7 +223,7 @@ void MainFrame::OnZoomOut ( wxCommandEvent &event ) {
 }
 
 void MainFrame::OnZoomIn ( wxCommandEvent &event ) {
-    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(notebook->GetCurrentPage());
+    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
     if(canvas){
       canvas->ZoomIn();
       canvas->UpdateCanvas();
@@ -215,27 +231,9 @@ void MainFrame::OnZoomIn ( wxCommandEvent &event ) {
 }
 
 void MainFrame::OnFitWin ( wxCommandEvent &event ) {
-    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(notebook->GetCurrentPage());
+    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
     if(canvas)
         canvas->FitSize();
-}
-
-void MainFrame::OnGraylize(wxCommandEvent &event) {
-    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(notebook->GetCurrentPage());
-    if(!canvas)
-        return;
-    wxImage image = canvas->GetImage();
-    int page_index = notebook->GetPageIndex(canvas);
-    wxString title = notebook->GetPageText(page_index);
-    if(image.IsOk()) {
-        image = GrayLize(image);
-        ImageCanvas *result_canvas = new ImageCanvas(notebook);
-        notebook->AddPage(result_canvas,title+"[gray]");
-        notebook->SetSelection(notebook->GetPageIndex(result_canvas));
-        result_canvas->SetImage(image);
-        result_canvas->FitSize();
-        mgr.Update();
-    }
 }
 
 void MainFrame::OnFileOpen ( wxCommandEvent &event ) {
@@ -248,9 +246,8 @@ void MainFrame::OnFileOpen ( wxCommandEvent &event ) {
     cur_file = fopen_dlg.GetPath();
     wxImage image ( cur_file );
     if ( image.IsOk() ){
-        ImageCanvas *canvas = new ImageCanvas(notebook);
-        notebook->AddPage(canvas, wxFileName(cur_file).GetName());
-        notebook->SetSelection(notebook->GetPageIndex(canvas));
+        ImageCanvas *canvas = new ImageCanvas(imagebook);
+        imagebook->AddPage(canvas, wxFileName(cur_file).GetName(),true);
         canvas->SetImage(image);
         canvas->FitSize();
         mgr.Update();
@@ -291,9 +288,8 @@ void MainFrame::OnImageClicked ( wxCommandEvent &event ) {
     cur_file = gallery->GetSelectImagePath();
     wxImage image ( cur_file );
     if ( image.IsOk() ){
-        ImageCanvas *canvas = new ImageCanvas(notebook);
-        notebook->AddPage(canvas, wxFileName(cur_file).GetName());
-        notebook->SetSelection(notebook->GetPageIndex(canvas));
+        ImageCanvas *canvas = new ImageCanvas(imagebook);
+        imagebook->AddPage(canvas, wxFileName(cur_file).GetName(),true);
         canvas->SetImage(image);
         canvas->FitSize();
         mgr.Update();
@@ -313,4 +309,24 @@ void MainFrame::UpdateInfo ( bool update_tree )
     wxString changed = ( image_changed ) ?"*":" ";
     wxString info = wxString::Format ( "%s %s[%s]-%s", file_name.GetFullName(),changed, cur_dir, APP_NAME );
     SetTitle ( info );
+}
+
+void MainFrame::OnImageRequest(wxCommandEvent &event) {
+    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
+    if(!canvas || !plugin)
+        return;
+    wxImage image = canvas->GetImage();
+    if(!image.IsOk())
+        return;
+    plugImageEvent evt;
+    evt.SetImage(image);
+    wxQueueEvent(plugin, evt.Clone());
+}
+
+void MainFrame::OnImageUpdate(plugImageEvent &event) {
+    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
+    if(!canvas || !plugin)
+        return;
+
+    canvas->SetImage(event.GetImage());
 }

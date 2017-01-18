@@ -5,7 +5,7 @@
 #ifndef _IMAGECANVAS_H_
 #define _IMAGECANVAS_H_
 
-#include "wx_pch.h"
+#include "wx/wx.h"
 
 class ImageCanvas : public wxScrolled<wxWindow> {
     enum _CONST {

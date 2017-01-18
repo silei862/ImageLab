@@ -6,12 +6,17 @@
 #ifndef PROGRESSBAR_H
 #define PROGRESSBAR_H
 
-#include "wx_pch.h"
+#include "wx/wx.h"
+
+wxDECLARE_EVENT(progrEVT_START, wxCommandEvent);
+wxDECLARE_EVENT(progrEVT_UPDATE, wxCommandEvent);
+wxDECLARE_EVENT(progrEVT_COMPLETE, wxCommandEvent);
 
 class ProgressBar : public wxControl {
-	
+
 private:
  	enum _CONST {
+        DEF_MAX_NUM = 1000,
 		DEF_WIDTH = 100,
 		DEF_HEIGHT = 30,
 		HT_MARGIN = 2,
@@ -53,8 +58,14 @@ public:
 
 	void SetValue(wxDouble val);
 
+    void OnStart(wxCommandEvent &event);
+    void OnUpdate(wxCommandEvent &event);
+    void OnComplete(wxCommandEvent &event);
+
 private:
 	wxDouble value;
+    size_t progress_num;
+    size_t max_num;
 	wxPen front_pen;
 	wxPen back_pen;
 	wxBrush front_brush;

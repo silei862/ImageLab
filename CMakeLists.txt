@@ -1,15 +1,16 @@
-PROJECT(PixeLab)
+project(PixeLab)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-IF(WIN32)
-    SET(OpenCV_INSTALL_PATH /home/silei/.local/x86_64-w64-mingw32)
-ENDIF(WIN32)
+if(MINGW)
+    set(OpenCV_INSTALL_PATH /home/silei/.local/x86_64-w64-mingw32)
+endif(MINGW)
 
-FIND_PACKAGE(wxWidgets REQUIRED core base aui)
+find_package(wxWidgets REQUIRED core base aui xrc)
 
-FIND_PACKAGE(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED)
 
-ADD_SUBDIRECTORY(utils)
-ADD_SUBDIRECTORY(imgproc)
-ADD_SUBDIRECTORY(gui)
+add_subdirectory(utils)
+add_subdirectory(plugmgr)
+add_subdirectory(plugins)
+add_subdirectory(gui)

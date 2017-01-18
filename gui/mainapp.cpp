@@ -4,7 +4,12 @@
 
 //#include "wx_pch.h"
 #include <wx/wx.h>
+#include <wx/filesys.h>
+#include <wx/fs_arc.h>
+#include <wx/xrc/xmlres.h>
 #include "mainframe.h"
+
+extern void InitXmlResource();
 
 class MainApp : public wxApp {
 
@@ -18,6 +23,15 @@ bool MainApp::OnInit()
 {
     bool wxsOK = true;
     wxInitAllImageHandlers();
+    wxXmlResource::Get()->InitAllHandlers();
+    InitXmlResource();
+ /* wxFileSystem::AddHandler(new wxArchiveFSHandler);
+    wxXmlResource::Get()->InitAllHandlers();
+    if(!wxXmlResource::Get()->Load("../res/aboutpane.xrs")){
+        wxPrintf("Load resource fail!\n");
+        return false;
+    }*/
+
     if ( wxsOK ) {
         MainFrame* frm = new MainFrame ( NULL, wxID_ANY, _ ( "Image Lab" ) );
         SetTopWindow ( frm );
