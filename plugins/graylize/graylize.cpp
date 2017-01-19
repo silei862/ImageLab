@@ -1,5 +1,6 @@
-
-
+// File	    : graylize.cpp
+// Author	: Silei
+// Descr	: graylize plugin
 
 #include <wx/panel.h>
 #include <wx/image.h>
@@ -10,13 +11,15 @@
 #include "graylize.h"
 
 
-GraylizePane::GraylizePane(wxWindow *parent, GraylizePlugin *plug, wxWindowID id)
-    :wxPanel(parent, id),
-      plugin(plug){
+GraylizePane::GraylizePane(wxWindow *parent, ImagePlugin *plug, wxWindowID id)
+    :PluginGUI(parent, plug, id){
 
     wxSizer *main_sizer = new wxBoxSizer(wxVERTICAL);
 
-    { //================Plugin Control====================
+    grey_eq = new wxCheckBox(this, wxID_ANY, _("Grey level equaliztion"));
+    main_sizer->Add(grey_eq, 0, wxALL, 5);
+
+    { //================ Button group ====================
         wxSizer *plugctrl_sizer = new wxBoxSizer(wxHORIZONTAL);
 
         wxButton *apply_btn = new wxButton(this, ID_APPLY, _("Apply"));
@@ -43,25 +46,35 @@ GraylizePane::~GraylizePane(){
 }
 
 void GraylizePane::Excute() {
-    origin = plugin->GetImage();
+    origin = GetPlugin()->GetImage();
+    //>>>>>> For debug
     if(!origin.IsOk()) {
         wxLogError("origin Image broken!");
         return;
     }
+    //<<<<<<<
+
     wxImage result;
     cv::Mat normal, gray;
     origin>>normal;
     cv::cvtColor(normal, gray, CV_RGB2GRAY);
-    gray>>result;
-    plugin->SendImage(result);
+
+    //need equaliztion?
+    if(grey_eq->IsChecked()) {
+        cv::Mat gray_eq;
+        cv::equalizeHist(gray, gray_eq);
+        gray_eq>>result;
+    } else
+        gray>>result;
+    GetPlugin()->SendImage(result);
 }
 
 void GraylizePane::OnApply(wxCommandEvent &event) {
-    plugin->RequestImage();
+    GetPlugin()->RequestImage();
 }
 
 void GraylizePane::OnCancel(wxCommandEvent &event) {
-    plugin->SendImage(origin);
+    GetPlugin()->SendImage(origin);
 }
 
 DEFINE_PLUGIN_CREATOR(GraylizePlugin)

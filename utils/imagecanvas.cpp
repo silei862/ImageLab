@@ -26,10 +26,20 @@ ImageCanvas::ImageCanvas(wxWindow *parent,
     SetMinSize(wxSize(600, 350));
     SetDoubleBuffered(true);
 
+    menu = new wxMenu();
+    menu->Append(ID_FIT, _("Fit"));
+    menu->Append(ID_ZOOMIN,_("Zoom In"));
+    menu->Append(ID_ZOOMOUT, _("Zoom Out"));
+
     Bind(wxEVT_PAINT, &ImageCanvas::OnPaint, this);
     Bind(wxEVT_MOUSEWHEEL, &ImageCanvas::OnMouseWheel, this);
     Bind(wxEVT_LEFT_DOWN, &ImageCanvas::OnMouseLeftDown, this);
+    Bind(wxEVT_RIGHT_DOWN, &ImageCanvas::OnMouseRightDown, this);
     Bind(wxEVT_MOTION, &ImageCanvas::OnMouseMotion, this);
+
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &ImageCanvas::OnFit, this, ID_FIT);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &ImageCanvas::OnZoomIn, this, ID_ZOOMIN);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &ImageCanvas::OnZoomOut, this, ID_ZOOMOUT);
 }
 
 ImageCanvas::~ImageCanvas() {}
@@ -186,4 +196,24 @@ void ImageCanvas::OnMouseMotion(wxMouseEvent &event) {
         scy = scrollPos.y - y + mousePos.y;
         Scroll(scx, scy);
     }
+}
+
+void ImageCanvas::OnMouseRightDown(wxMouseEvent &event) {
+    wxPoint pos = event.GetPosition();
+    this->PopupMenu(menu, pos);
+}
+
+void ImageCanvas::OnFit(wxCommandEvent &event) {
+    FitSize();
+    Refresh();
+}
+
+void ImageCanvas::OnZoomIn(wxCommandEvent &event) {
+    ZoomIn();
+    Refresh();
+}
+
+void ImageCanvas::OnZoomOut(wxCommandEvent &event) {
+    ZoomOut();
+    Refresh();
 }

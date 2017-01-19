@@ -1,3 +1,6 @@
+// File	    : plugin.cpp
+// Author	: Silei
+// Descr	: plugin related utility
 
 
 #include "plugin.h"

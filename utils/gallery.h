@@ -6,7 +6,6 @@
 #define _GALLERY_H_
 
 #include <wx/vlbox.h>
-#include <wx/imaglist.h>
 #include <wx/event.h>
 #include <wx/thread.h>
 #include "transqueue.h"

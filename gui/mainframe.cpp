@@ -15,6 +15,7 @@
 #include "imagecanvas.h"
 #include "progressbar.h"
 #include "plugin.h"
+#include "plugmgr.h"
 
 const wxString MainFrame::APP_NAME        = _ ( "ImageLab" );
 const wxString MainFrame::KEY_CUR_DIR     = _ ( "CurrentDir" );
@@ -24,7 +25,6 @@ MainFrame::MainFrame ( wxWindow *parent, wxWindowID id, const wxString &title,
                        const wxPoint &pos, const wxSize &size, long style,
                        const wxString &name )
     :wxFrame ( parent, id, title, pos, size, style, name ),
-      plugin(nullptr),
       image_changed ( false ) {
 
     LoadConfigs();
@@ -35,6 +35,10 @@ MainFrame::MainFrame ( wxWindow *parent, wxWindowID id, const wxString &title,
 MainFrame::~MainFrame() {
     SaveConfigs();
     mgr.UnInit();
+    //>>>>>>>>>Invoke destructor of PluginLoader cause program terminate which exception
+    //>>>>>>>>>This exception is caused by wxDynamicLibrary::Unload(wxDllType handle)
+    //>>>>>>>>>there might be an other way to archive this
+    //delete plugin_loader;
 }
 
 inline void MainFrame::InitGUI() {
@@ -138,19 +142,17 @@ inline void MainFrame::InitPanes() {
     wxPanel *about_pane = wxXmlResource::Get()->LoadPanel(toolbook,"AboutPane");
     toolbook->AddPage(about_pane,"About", true);
 
-//////!!!!! Test Code !!!!!!////
-    wxDynamicLibrary loader;
-    loader.Load("./graylize.so");
-    if(loader.IsLoaded()){
-        wxDYNLIB_FUNCTION(PluginCreator, CreatePlugin, loader);
-        if(pfnCreatePlugin) {
-            loader.Detach();
-            plugin = (pfnCreatePlugin)(this->GetEventHandler());
-            wxWindow *gpane = plugin->GetWindow(toolbook, wxID_ANY);
-            toolbook->AddPage(gpane, plugin->GetPluginName(), true);
-        }
-    }
-////////////////////////////////
+//>>>>>>>>>>>>>>>>>>>>>>> Test Code : Plugin load
+    plugin_loader = new PluginLoader(this->GetEventHandler());
+    if(plugin_loader->Append("./"+wxDynamicLibrary::CanonicalizeName("graylize", wxDL_MODULE))){
+        plugin_mgr.BindLoader(plugin_loader);
+        plugin_mgr.InitPlugin(this->GetEventHandler());
+        wxWindow *pane = plugin_mgr[0]->GetWindow(toolbook, wxID_ANY);
+        toolbook->AddPage(pane, plugin_mgr[0]->GetPluginName(), true);
+    } else
+        wxLogError("plugin append failed!");
+
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     mgr.AddPane(toolbook, wxAuiPaneInfo().Name("Toolbook").Right().CloseButton(false).MinSize(300,600));
 
@@ -215,7 +217,7 @@ void MainFrame::OnExit ( wxCommandEvent &event ) {
 }
 
 void MainFrame::OnZoomOut ( wxCommandEvent &event ) {
-    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
+    ImageCanvas *canvas = dynamic_cast<ImageCanvas*>(imagebook->GetCurrentPage());
     if(canvas){
         canvas->ZoomOut();
         canvas->UpdateCanvas();
@@ -223,7 +225,7 @@ void MainFrame::OnZoomOut ( wxCommandEvent &event ) {
 }
 
 void MainFrame::OnZoomIn ( wxCommandEvent &event ) {
-    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
+    ImageCanvas *canvas = dynamic_cast<ImageCanvas*>(imagebook->GetCurrentPage());
     if(canvas){
       canvas->ZoomIn();
       canvas->UpdateCanvas();
@@ -231,7 +233,7 @@ void MainFrame::OnZoomIn ( wxCommandEvent &event ) {
 }
 
 void MainFrame::OnFitWin ( wxCommandEvent &event ) {
-    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
+    ImageCanvas *canvas = dynamic_cast<ImageCanvas*>(imagebook->GetCurrentPage());
     if(canvas)
         canvas->FitSize();
 }
@@ -256,7 +258,11 @@ void MainFrame::OnFileOpen ( wxCommandEvent &event ) {
 }
 
 void MainFrame::OnFileSave ( wxCommandEvent &event ) {
-
+//>>>>>>>>>>>>>>>>>>>>>>>>>> Test
+    wxString msg;
+    msg.Printf("Ccplug:%s",wxDynamicLibrary::CanonicalizeName("Guassian", wxDL_MODULE));
+    wxMessageBox(msg, "TEST!");
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<
 }
 
 void MainFrame::OnFileActived ( wxTreeEvent &event ) {
@@ -312,20 +318,21 @@ void MainFrame::UpdateInfo ( bool update_tree )
 }
 
 void MainFrame::OnImageRequest(wxCommandEvent &event) {
-    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
-    if(!canvas || !plugin)
+    ImageCanvas *canvas = dynamic_cast<ImageCanvas*>(imagebook->GetCurrentPage());
+    PluginGUI *plug_gui = dynamic_cast<PluginGUI*>(toolbook->GetCurrentPage());
+    if(!canvas || !plug_gui)
         return;
     wxImage image = canvas->GetImage();
     if(!image.IsOk())
         return;
     plugImageEvent evt;
     evt.SetImage(image);
-    wxQueueEvent(plugin, evt.Clone());
+    wxQueueEvent(plug_gui->GetPlugin(), evt.Clone());
 }
 
 void MainFrame::OnImageUpdate(plugImageEvent &event) {
-    ImageCanvas *canvas = reinterpret_cast<ImageCanvas*>(imagebook->GetCurrentPage());
-    if(!canvas || !plugin)
+    ImageCanvas *canvas = dynamic_cast<ImageCanvas*>(imagebook->GetCurrentPage());
+    if(!canvas)
         return;
 
     canvas->SetImage(event.GetImage());

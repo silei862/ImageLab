@@ -16,6 +16,12 @@ class ImageCanvas : public wxScrolled<wxWindow> {
         SCALE_DELTA = 5, // zoom out/in step
     };
 
+    enum _IDS {
+        ID_FIT = wxID_HIGHEST,
+        ID_ZOOMIN,
+        ID_ZOOMOUT,
+    };
+
 public:
     ImageCanvas(wxWindow *parent, wxWindowID id = wxID_ANY,
                 const wxPoint &pos = wxPoint(0, 0),
@@ -40,11 +46,17 @@ public:
     void UpdateCanvas();
     void UpdateCanvas(int x, int y);
 
-    ///////////////// Event Handler ////////////////////
+    ///////////////// Mouse Event ////////////////////
     void OnPaint(wxPaintEvent &event);
     void OnMouseWheel(wxMouseEvent &event);
     void OnMouseLeftDown(wxMouseEvent &event);
+    void OnMouseRightDown(wxMouseEvent &event);
     void OnMouseMotion(wxMouseEvent &event);
+
+    ///////////////// Menu Command Event //////////////////////
+    void OnFit(wxCommandEvent &event);
+    void OnZoomIn(wxCommandEvent &event);
+    void OnZoomOut(wxCommandEvent &event);
 
 private:
     // Draw image to screen:
@@ -64,6 +76,8 @@ private:
     int scaleMax;
     int scaleMin;
     int scaleDelta;
+
+    wxMenu *menu;   // Popup menu
 };
 
 #endif //_IMAGECANVAS_H_

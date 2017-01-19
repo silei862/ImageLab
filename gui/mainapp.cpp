@@ -25,12 +25,6 @@ bool MainApp::OnInit()
     wxInitAllImageHandlers();
     wxXmlResource::Get()->InitAllHandlers();
     InitXmlResource();
- /* wxFileSystem::AddHandler(new wxArchiveFSHandler);
-    wxXmlResource::Get()->InitAllHandlers();
-    if(!wxXmlResource::Get()->Load("../res/aboutpane.xrs")){
-        wxPrintf("Load resource fail!\n");
-        return false;
-    }*/
 
     if ( wxsOK ) {
         MainFrame* frm = new MainFrame ( NULL, wxID_ANY, _ ( "Image Lab" ) );

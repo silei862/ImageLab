@@ -16,6 +16,7 @@
 #include "imagecanvas.h"
 #include "gallery.h"
 #include "plugin.h"
+#include "plugmgr.h"
 
 class wxDynamicLibrary;
 
@@ -94,11 +95,13 @@ private:
 	ProgressBar *progress_bar;
 
 	wxConfig *configs;
-    Plugin *plugin;
 	wxString cur_dir;
 	wxString cur_file;
 	wxString perspective;
 	bool image_changed;
+
+    PluginManager plugin_mgr;
+    PluginLoader  *plugin_loader;
 };
 
 #endif //MAINFRAME_H

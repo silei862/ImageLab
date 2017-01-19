@@ -1,9 +1,13 @@
+// File	    : plugin.h
+// Author	: Silei
+// Descr	: plugin related utility
 
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
 #include <wx/wx.h>
 
+//======================= Image update event =============================
 wxDECLARE_EVENT(plugEVT_IMAGE_REQUEST, wxCommandEvent);
 
 class plugImageEvent;
@@ -79,6 +83,26 @@ public:
 private:
     wxImage image;
     wxEvtHandler *handler;
+};
+
+//=========================== Plugin GUI Base class =============================
+class PluginGUI : public wxWindow {
+
+public:
+    PluginGUI(wxWindow *parent,
+              ImagePlugin* plug,
+              wxWindowID id = wxID_ANY,
+              const wxPoint pos = wxDefaultPosition,
+              const wxSize size = wxDefaultSize,
+              long style = 0,
+              const wxString name = wxPanelNameStr)
+        :wxWindow(parent, id, pos, size, style, name),
+          plugin(plug){ }
+
+    ImagePlugin* GetPlugin() const { return plugin; }
+
+private:
+    ImagePlugin *plugin;
 };
 
 #endif //PLUGIN_H

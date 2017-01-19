@@ -1,5 +1,6 @@
-
-
+// File	    : graylize.h
+// Author	: Silei
+// Descr	: graylize plugin
 
 #ifndef GRAYLIZE_H
 #define GRAYLIZE_H
@@ -13,14 +14,14 @@ class wxImage;
 
 class GraylizePlugin;
 
-class GraylizePane : public wxPanel {
+class GraylizePane : public PluginGUI {
     enum _IDS {
         ID_APPLY = wxID_HIGHEST,
         ID_CANCEL,
     };
 
 public:
-    GraylizePane(wxWindow *parent, GraylizePlugin *plug, wxWindowID id = wxID_ANY);
+    GraylizePane(wxWindow *parent, ImagePlugin *plug, wxWindowID id = wxID_ANY);
     ~GraylizePane();
 
     void OnApply(wxCommandEvent &event);
@@ -29,8 +30,8 @@ public:
     void Excute();
 
 private:
+    wxCheckBox *grey_eq;
     wxImage origin;
-    GraylizePlugin *plugin;
 };
 
 class GraylizePlugin : public ImagePlugin {
