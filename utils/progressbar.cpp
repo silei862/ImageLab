@@ -28,9 +28,10 @@ ProgressBar::ProgressBar ( wxWindow *parent, wxWindowID id, const wxPoint &pos,
     font ( wxFont ( FONT_SIZE, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD ) ) {
 
     SetBackgroundColour ( back_colour );
-    //绑定事件处理器：
+
     Bind ( wxEVT_PAINT, &ProgressBar::OnPaint, this );
 
+    //This make progress bar update by event-driving
     Bind (progrEVT_START, &ProgressBar::OnStart, this);
     Bind (progrEVT_UPDATE, &ProgressBar::OnUpdate, this);
     Bind (progrEVT_COMPLETE, &ProgressBar::OnComplete, this);
@@ -91,7 +92,10 @@ void ProgressBar::OnStart(wxCommandEvent &event) {
 void ProgressBar::OnUpdate(wxCommandEvent &event) {
     progress_num++;
     progress_num = (progress_num <= max_num) ? progress_num : max_num;
-    SetValue(wxDouble(progress_num)/wxDouble(max_num));
+    if(max_num)
+        SetValue(wxDouble(progress_num)/wxDouble(max_num));
+    else
+        SetValue(1.0);
     Refresh();
 }
 

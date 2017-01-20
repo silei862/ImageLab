@@ -25,13 +25,13 @@ bool PluginLoader::Append(const wxString &path) {
     }
     //Save key data
     creators.push_back(creator);
-    wxDllType dl_handle = dll_loader.Detach();
-    dl_handles.push_back(dl_handle);
+    wxDllType hdl = dll_loader.Detach();
+    dl_handles.push_back(hdl);
     return true;
 }
 
 void PluginLoader::Load() {
-    if(CreateThread() != wxTHREAD_NO_ERROR) {
+    if(CreateThread(wxTHREAD_DETACHED) != wxTHREAD_NO_ERROR) {
         wxLogError("Create plugin loading thread failed!");
         return;
     }
@@ -43,8 +43,22 @@ void PluginLoader::Load() {
 }
 
 wxThread::ExitCode PluginLoader::Entry() {
-   wxArrayString pathes;
-  //>>>>>>>>>>>>>>> To-do : complete plugin loading:
+    wxString dll_ext = wxDynamicLibrary::GetDllExt(wxDL_MODULE);
+    wxArrayString pathes;
+    wxDir::GetAllFiles(plugin_dir, &pathes, "*"+dll_ext);
+
+    if(pathes.size() <= 0)
+        return wxThread::ExitCode(0);
+
+    SendStatus(plugmgrEVT_LOADER_START, pathes.size());
+
+    for(size_t i = 0; i < pathes.size(); i++){
+        Append(pathes[i]);
+        SendStatus(plugmgrEVT_LOADER_PROGRESS, i + 1);
+    }
+
+    SendStatus(plugmgrEVT_LOADER_COMPLETE);
+    return wxThread::ExitCode(0);
 }
 
 void PluginManager::InitPlugin(wxEvtHandler *handler){

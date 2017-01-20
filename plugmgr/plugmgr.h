@@ -20,13 +20,25 @@ class PluginLoader : public wxThreadHelper {
 
     friend class PluginManager;
 public:
-    PluginLoader(wxEvtHandler *evthlr = nullptr, const wxString &path = wxEmptyString)
-        :evt_handler(evthlr),
+    PluginLoader(wxEvtHandler *evthdlr = nullptr, const wxString &path = wxEmptyString)
+        :evt_handler(evthdlr),
           plugin_dir(path){ }
 
     ~PluginLoader() {
-        for(size_t i = 0; i < dl_handles.size(); i++)
-            wxDynamicLibrary::Unload(dl_handles[i]);
+        //Wait loading thread to finish
+        if(GetThread() && GetThread()->IsRunning()) {
+            GetThread()->Delete();
+            while(GetThread() && GetThread()->IsRunning())
+                wxThread::This()->Sleep(1);
+        }
+
+        for(auto hdl : dl_handles)
+            if(hdl)
+                wxDynamicLibrary::Unload(hdl);
+    }
+
+    void BindEvtHandler(wxEvtHandler *evthdlr) {
+        evt_handler = evthdlr;
     }
 
     void Load();
@@ -34,6 +46,11 @@ public:
     void Load(const wxString &path) {
         plugin_dir = path;
         Load();
+    }
+
+    void Wait() {
+        while(GetThread() && GetThread()->IsRunning())
+            wxThread::This()->Sleep(1);
     }
 
     bool Append(const wxString &path);
@@ -47,6 +64,14 @@ public:
     }
 
 private:
+    void SendStatus(wxEventType type, size_t n = 0) {
+        if(evt_handler) {
+            wxThreadEvent event(type);
+            event.SetExtraLong(n);
+            wxQueueEvent(evt_handler, event.Clone());
+        }
+    }
+
     virtual wxThread::ExitCode Entry();
 
 private:
@@ -70,7 +95,11 @@ public:
 
     void BindLoader(PluginLoader *ldr) {
         loader = ldr;
-}
+    }
+
+    PluginLoader *GetLoader() const {
+        return loader;
+    }
 
     void InitPlugin(wxEvtHandler* handler);
 
@@ -80,6 +109,10 @@ public:
 
     Plugin* operator[](size_t index) const {
         return plugins[index];
+    }
+
+    size_t GetPluginNum() const {
+        return plugins.size();
     }
 
 private:

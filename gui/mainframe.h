@@ -44,11 +44,13 @@ class MainFrame : public wxFrame {
 	const static wxString KEY_PERSPECTIVE;
 
 public:
-	MainFrame(wxWindow *parent, wxWindowID id, const wxString &title,
-			const wxPoint &pos = wxDefaultPosition,
-			const wxSize &size = wxDefaultSize,
-			long style = wxDEFAULT_FRAME_STYLE,
-			const wxString &name = wxFrameNameStr);
+    MainFrame(wxWindow *parent,
+              PluginLoader *loader,
+              wxWindowID id, const wxString &title,
+              const wxPoint &pos = wxDefaultPosition,
+              const wxSize &size = wxDefaultSize,
+              long style = wxDEFAULT_FRAME_STYLE,
+              const wxString &name = wxFrameNameStr);
 	~MainFrame();
 	
 	inline void InitGUI();
@@ -74,8 +76,10 @@ public:
 	void OnFileActived(wxTreeEvent &event);
     void OnDirChanged(wxTreeEvent &event);
     void OnImageClicked(wxCommandEvent &event);
-    void OnGalleryProgress(wxCommandEvent &event);
-    void OnGalleryComplete(wxCommandEvent &event);
+
+    void OnProgressStart(wxCommandEvent &event);
+    void OnProgressUpdate(wxCommandEvent &event);
+    void OnProgressComplete(wxCommandEvent &event);
 
     void OnImageRequest(wxCommandEvent &event);
     void OnImageUpdate(plugImageEvent &event);
@@ -101,7 +105,6 @@ private:
 	bool image_changed;
 
     PluginManager plugin_mgr;
-    PluginLoader  *plugin_loader;
 };
 
 #endif //MAINFRAME_H

@@ -6,6 +6,7 @@
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/log.h>
+#include "progressbar.h"
 #include "gallery.h"
 
 const wxString image_spec[] = { "*.jpg" , "*.jpeg" , "*.png" , "*.pnm" , "*.ico",
@@ -13,10 +14,9 @@ const wxString image_spec[] = { "*.jpg" , "*.jpeg" , "*.png" , "*.pnm" , "*.ico"
                               };
 
 wxDEFINE_EVENT(pxEVT_IMAGE_LOADED, wxThreadEvent);
+wxDEFINE_EVENT(pxEVT_PROGRESS_START, wxThreadEvent);
 wxDEFINE_EVENT(pxEVT_PROGRESS_UPDATE, wxThreadEvent);
 wxDEFINE_EVENT(pxEVT_PROGRESS_COMPLETE, wxThreadEvent);
-wxDEFINE_EVENT(pxEVT_GALLERY_PROGRESS, wxCommandEvent);
-wxDEFINE_EVENT(pxEVT_GALLERY_COMPLETE, wxCommandEvent);
 
 Gallery::Gallery(wxWindow *parent, wxWindowID id,
                  const wxPoint &pos, const wxSize &size,
@@ -27,6 +27,7 @@ Gallery::Gallery(wxWindow *parent, wxWindowID id,
 
     // Bind the Post processor
     Bind(pxEVT_IMAGE_LOADED, &Gallery::OnImageLoaded, this);
+    Bind(pxEVT_PROGRESS_START, &Gallery::OnProgressStart, this);
     Bind(pxEVT_PROGRESS_UPDATE, &Gallery::OnProgressUpdate, this);
     Bind(pxEVT_PROGRESS_COMPLETE, &Gallery::OnProgressComplete, this);
     Bind(wxEVT_DESTROY, &Gallery::OnClose, this);
@@ -71,18 +72,23 @@ void Gallery::OnImageLoaded(wxThreadEvent &event) {
     }
     SetItemCount(previews.size());
 
-    //Inform the parent window to update informations
-    wxQueueEvent(GetParent(), new wxCommandEvent(pxEVT_GALLERY_PROGRESS, GetId()));
+    // Inform the parent window to update informations
+    SendProgressStatus(progrEVT_UPDATE, event.GetExtraLong());
+}
 
+void Gallery::OnProgressStart(wxThreadEvent &event)
+{
+    // Redirect image loading progress:
+    SendProgressStatus(progrEVT_START, event.GetExtraLong());
 }
 
 void Gallery::OnProgressUpdate(wxThreadEvent &event) {
-    wxQueueEvent(GetParent(), new wxCommandEvent(pxEVT_GALLERY_PROGRESS, GetId()));
+    SendProgressStatus(progrEVT_UPDATE, event.GetExtraLong());
 }
 
 void Gallery::OnProgressComplete(wxThreadEvent &event) {
     SetItemCount(previews.size());
-    wxQueueEvent(GetParent(), new wxCommandEvent(pxEVT_GALLERY_COMPLETE, GetId()));
+    SendProgressStatus(progrEVT_COMPLETE, event.GetExtraLong());
 }
 
 void Gallery::StartLoad(const wxString &path) {
@@ -133,13 +139,15 @@ wxThread::ExitCode Gallery::Entry() {
         for( auto spec : image_spec)
             wxDir::GetAllFiles(dir_path, &pathes, spec, wxDIR_FILES | wxDIR_HIDDEN );
     }
+
+    // Send Start event
+    wxThreadEvent event(pxEVT_PROGRESS_START);
+    event.SetExtraLong(pathes.size());
+    wxQueueEvent(this->GetEventHandler(), event.Clone());
+
     wxImage image;
     for(size_t i = 0; i < pathes.size() ; i++ ) {
-        {
-            wxCriticalSectionLocker lock(progress_cs);
-            progress = wxDouble(i+1)/wxDouble(pathes.size());
-        }
-
+        // Make sure the image is readable
         if(wxImage::CanRead(pathes[i]))
             image.LoadFile(pathes[i], wxBITMAP_TYPE_ANY);
             if(image.IsOk()) {
@@ -151,25 +159,26 @@ wxThread::ExitCode Gallery::Entry() {
                 //put them in transfer queue
                 image_queue<<image;
                 path_queue<<pathes[i];
-                wxQueueEvent(this->GetEventHandler(), new wxCommandEvent(pxEVT_IMAGE_LOADED));
+                //send image loaded event
+                event.SetEventType(pxEVT_IMAGE_LOADED);
+                event.SetExtraLong(i);
+                wxQueueEvent(this->GetEventHandler(), event.Clone());
             }
-        else {
-            wxQueueEvent(this->GetEventHandler(), new wxCommandEvent(pxEVT_PROGRESS_UPDATE));
+            else {
+                event.SetEventType(pxEVT_PROGRESS_UPDATE);
+                event.SetExtraLong(i);
+                wxQueueEvent(this->GetEventHandler(), event.Clone());
         }
         if(GetThread()->TestDestroy())
             break;
     }
-    wxQueueEvent(this->GetEventHandler(), new wxCommandEvent(pxEVT_PROGRESS_COMPLETE));
+    event.SetEventType(pxEVT_PROGRESS_COMPLETE);
+    wxQueueEvent(this->GetEventHandler(), event.Clone());
     return wxThread::ExitCode(0);
 }
 
 const wxString& Gallery::GetSelectImagePath() {
     return image_pathes[GetSelection()];
-}
-
-wxDouble Gallery::GetProgressValue() {
-    wxCriticalSectionLocker lock(progress_cs);
-    return progress;
 }
 
 wxSize Gallery::GetFitSize(const wxSize &size) {
@@ -181,4 +190,11 @@ wxSize Gallery::GetFitSize(const wxSize &size) {
     wxDouble hscale = wxDouble(bh)/wxDouble(h);
     wxDouble scale = (wscale < hscale) ? wscale : hscale;
     return wxSize(w*scale, h*scale);
+}
+
+void Gallery::SendProgressStatus(wxEventType type, size_t n)
+{
+    wxCommandEvent event(type, GetId());
+    event.SetExtraLong(n);
+    wxQueueEvent(GetParent(), event.Clone());
 }

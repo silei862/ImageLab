@@ -21,10 +21,11 @@ const wxString MainFrame::APP_NAME        = _ ( "ImageLab" );
 const wxString MainFrame::KEY_CUR_DIR     = _ ( "CurrentDir" );
 const wxString MainFrame::KEY_PERSPECTIVE = _ ( "Perspective" );
 
-MainFrame::MainFrame ( wxWindow *parent, wxWindowID id, const wxString &title,
+MainFrame::MainFrame (wxWindow *parent, PluginLoader *loader, wxWindowID id, const wxString &title,
                        const wxPoint &pos, const wxSize &size, long style,
                        const wxString &name )
-    :wxFrame ( parent, id, title, pos, size, style, name ),
+    :plugin_mgr(loader),
+      wxFrame ( parent, id, title, pos, size, style, name ),
       image_changed ( false ) {
 
     LoadConfigs();
@@ -35,10 +36,6 @@ MainFrame::MainFrame ( wxWindow *parent, wxWindowID id, const wxString &title,
 MainFrame::~MainFrame() {
     SaveConfigs();
     mgr.UnInit();
-    //>>>>>>>>>Invoke destructor of PluginLoader cause program terminate which exception
-    //>>>>>>>>>This exception is caused by wxDynamicLibrary::Unload(wxDllType handle)
-    //>>>>>>>>>there might be an other way to archive this
-    //delete plugin_loader;
 }
 
 inline void MainFrame::InitGUI() {
@@ -142,17 +139,12 @@ inline void MainFrame::InitPanes() {
     wxPanel *about_pane = wxXmlResource::Get()->LoadPanel(toolbook,"AboutPane");
     toolbook->AddPage(about_pane,"About", true);
 
-//>>>>>>>>>>>>>>>>>>>>>>> Test Code : Plugin load
-    plugin_loader = new PluginLoader(this->GetEventHandler());
-    if(plugin_loader->Append("./"+wxDynamicLibrary::CanonicalizeName("graylize", wxDL_MODULE))){
-        plugin_mgr.BindLoader(plugin_loader);
-        plugin_mgr.InitPlugin(this->GetEventHandler());
-        wxWindow *pane = plugin_mgr[0]->GetWindow(toolbook, wxID_ANY);
-        toolbook->AddPage(pane, plugin_mgr[0]->GetPluginName(), true);
-    } else
-        wxLogError("plugin append failed!");
-
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    //================================== Init Plugin GUIs =============================
+    plugin_mgr.InitPlugin(GetEventHandler());
+    for(size_t i = 0; i < plugin_mgr.GetPluginNum(); i++) {
+        wxWindow *plugin_gui = plugin_mgr[i]->GetWindow(toolbook, wxID_ANY);
+        toolbook->AddPage(plugin_gui, plugin_mgr[i]->GetPluginName(), true);
+    }
 
     mgr.AddPane(toolbook, wxAuiPaneInfo().Name("Toolbook").Right().CloseButton(false).MinSize(300,600));
 
@@ -185,8 +177,11 @@ inline void MainFrame::BindEvtProc() {
     Bind ( wxEVT_DIRCTRL_SELECTIONCHANGED , &MainFrame::OnDirChanged  , this , ID_DIRCTRL );
 
     Bind ( wxEVT_LISTBOX_DCLICK  , &MainFrame::OnImageClicked   , this, ID_GALLERY );
-    Bind ( pxEVT_GALLERY_PROGRESS, &MainFrame::OnGalleryProgress, this, ID_GALLERY );
-    Bind ( pxEVT_GALLERY_COMPLETE, &MainFrame::OnGalleryComplete, this, ID_GALLERY );
+
+    //progress bar related event:
+    Bind ( progrEVT_START, &MainFrame::OnProgressStart, this );
+    Bind ( progrEVT_UPDATE, &MainFrame::OnProgressUpdate, this );
+    Bind ( progrEVT_COMPLETE, &MainFrame::OnProgressComplete, this );
 
     Bind ( plugEVT_IMAGE_REQUEST, &MainFrame::OnImageRequest, this);
     Bind ( plugEVT_IMAGE, &MainFrame::OnImageUpdate, this);
@@ -258,11 +253,7 @@ void MainFrame::OnFileOpen ( wxCommandEvent &event ) {
 }
 
 void MainFrame::OnFileSave ( wxCommandEvent &event ) {
-//>>>>>>>>>>>>>>>>>>>>>>>>>> Test
-    wxString msg;
-    msg.Printf("Ccplug:%s",wxDynamicLibrary::CanonicalizeName("Guassian", wxDL_MODULE));
-    wxMessageBox(msg, "TEST!");
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 }
 
 void MainFrame::OnFileActived ( wxTreeEvent &event ) {
@@ -271,23 +262,6 @@ void MainFrame::OnFileActived ( wxTreeEvent &event ) {
 
 void MainFrame::OnDirChanged ( wxTreeEvent &event ) {
     gallery->StartLoad ( dir_ctrl->GetPath() );
-    progress_bar->SetValue ( 0.0 );
-    mgr.GetPane ( progress_bar ).Show();
-    toolbar_file->EnableTool ( ID_STOP, true );
-    mgr.Update();
-}
-
-void MainFrame::OnGalleryProgress ( wxCommandEvent &event ) {
-    SetStatusText ( _( "Caching Preview, Please wait..." ) );
-    progress_bar->SetValue ( gallery->GetProgressValue() );
-    progress_bar->Refresh();
-}
-
-void MainFrame::OnGalleryComplete ( wxCommandEvent &event ) {
-    mgr.GetPane ( progress_bar ).Hide();
-    toolbar_file->EnableTool ( ID_STOP, false );
-    mgr.Update();
-    SetStatusText ( _( "Caching Complete." ) );
 }
 
 void MainFrame::OnImageClicked ( wxCommandEvent &event ) {
@@ -301,6 +275,32 @@ void MainFrame::OnImageClicked ( wxCommandEvent &event ) {
         mgr.Update();
     }
     UpdateInfo ( false );
+}
+
+void MainFrame::OnProgressStart(wxCommandEvent &event)
+{
+    //Adjust main GUI to processing status
+    toolbar_file->EnableTool(ID_STOP, true);
+    mgr.GetPane(progress_bar).Show();
+    mgr.Update();
+    //Redirect event
+    wxQueueEvent(progress_bar->GetEventHandler(), event.Clone());
+}
+
+void MainFrame::OnProgressUpdate(wxCommandEvent &event)
+{
+    wxQueueEvent(progress_bar->GetEventHandler(), event.Clone());
+    SetStatusText ( _( "Caching Preview, Please wait..." ) );
+}
+
+void MainFrame::OnProgressComplete(wxCommandEvent &event)
+{
+    wxQueueEvent(progress_bar->GetEventHandler(), event.Clone());
+    //Adjust main GUI to normal status
+    toolbar_file->EnableTool(ID_STOP, true);
+    mgr.GetPane(progress_bar).Hide();
+    mgr.Update();
+    SetStatusText ( _( "Caching Complete." ) );
 }
 
 void MainFrame::UpdateInfo ( bool update_tree )

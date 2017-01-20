@@ -22,4 +22,4 @@ cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain/file
 make
 ```
 ### 3.注意事项
-*由于安装部署还没有做,工程构建完成后，将plugins/graylize/graylize.so复制到gui/下（和主程序pixelab同一路径），否则会报错*
+*由于安装部署还没有做,工程构建完成后，将plugins/graylize/graylize.so复制到gui/plugins下（plugins和主程序pixelab同一路径），否则插件不会载入*

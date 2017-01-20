@@ -11,10 +11,9 @@
 #include "transqueue.h"
 
 wxDECLARE_EVENT(pxEVT_IMAGE_LOADED, wxThreadEvent);
+wxDECLARE_EVENT(pxEVT_PROGRESS_START, wxThreadEvent);
 wxDECLARE_EVENT(pxEVT_PROGRESS_UPDATE, wxThreadEvent);
 wxDECLARE_EVENT(pxEVT_PROGRESS_COMPLETE, wxThreadEvent);
-wxDECLARE_EVENT(pxEVT_GALLERY_PROGRESS, wxCommandEvent);
-wxDECLARE_EVENT(pxEVT_GALLERY_COMPLETE, wxCommandEvent);
 
 class Gallery : public wxVListBox , public wxThreadHelper {
 
@@ -38,6 +37,7 @@ class Gallery : public wxVListBox , public wxThreadHelper {
 		void OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const;
 		wxCoord OnMeasureItem(size_t n) const;
         void OnImageLoaded(wxThreadEvent &event);
+        void OnProgressStart(wxThreadEvent &event);
         void OnProgressUpdate(wxThreadEvent &event);
         void OnProgressComplete(wxThreadEvent &event);
         void OnClose(wxWindowDestroyEvent &event);
@@ -46,17 +46,13 @@ class Gallery : public wxVListBox , public wxThreadHelper {
         void StopLoad();
 
         const wxString& GetSelectImagePath();
-        wxDouble GetProgressValue();
 
     protected:
         virtual wxThread::ExitCode Entry();
         wxSize GetFitSize(const wxSize& size);
+        void SendProgressStatus(wxEventType type, size_t n);
 
     private:
-
-        wxDouble progress;
-        wxCriticalSection progress_cs;
-
         wxString dir_path;
         wxCriticalSection dir_path_cs;
 
