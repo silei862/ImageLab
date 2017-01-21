@@ -18,6 +18,7 @@
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/sizer.h>
+#include <wx/statline.h>
 #include <wx/slider.h>
 #include <wx/checkbox.h>
 #include <wx/button.h>
@@ -45,6 +46,9 @@ class GreylizePaneBase : public wxPanel
 			ID_CANCEL
 		};
 		
+		wxStaticText* m_staticText71;
+		wxStaticText* m_staticText8;
+		wxStaticLine* m_staticline1;
 		wxStaticText* m_staticText5;
 		wxStaticText* m_staticText6;
 		wxStaticText* m_staticText7;
@@ -58,6 +62,7 @@ class GreylizePaneBase : public wxPanel
 		wxCheckBox* green_check;
 		wxCheckBox* blue_check;
 		wxCheckBox* eqhist_check;
+		wxStaticLine* m_staticline2;
 		wxButton* applyButton;
 		wxButton* cancelButton;
 		

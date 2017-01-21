@@ -1,4 +1,4 @@
-set(PLUGIN_NAME "greylize")
+set(PLUGIN_NAME "canny")
 aux_source_directory(. SRC_LIST)
 if(UNIX OR MINGW)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")

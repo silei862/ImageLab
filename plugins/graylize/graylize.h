@@ -25,6 +25,8 @@ public:
 
 private:
     wxCheckBox *grey_eq;
+    wxButton *apply_btn;
+    wxButton *cancel_btn;
     wxImage origin;
 };
 

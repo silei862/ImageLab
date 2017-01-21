@@ -16,6 +16,43 @@ GreylizePaneBase::GreylizePaneBase( wxWindow* parent, wxWindowID id, const wxPoi
 	wxBoxSizer* bSizer6;
 	bSizer6 = new wxBoxSizer( wxVERTICAL );
 	
+	wxBoxSizer* bSizer11;
+	bSizer11 = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText71 = new wxStaticText( this, wxID_ANY, _("Greylize Operator"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText71->Wrap( -1 );
+	m_staticText71->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
+	m_staticText71->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHT ) );
+	
+	bSizer11->Add( m_staticText71, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxBoxSizer* bSizer10;
+	bSizer10 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer10->Add( 0, 0, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_staticText8 = new wxStaticText( this, wxID_ANY, _("Use the slider to adjust Weight of each RGB channel."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText8->Wrap( -1 );
+	m_staticText8->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_SLANT, wxFONTWEIGHT_NORMAL, false, wxEmptyString ) );
+	m_staticText8->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
+	
+	bSizer10->Add( m_staticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer10->Add( 0, 0, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer11->Add( bSizer10, 1, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_staticline1 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	m_staticline1->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString ) );
+	
+	bSizer11->Add( m_staticline1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer6->Add( bSizer11, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -99,6 +136,9 @@ GreylizePaneBase::GreylizePaneBase( wxWindow* parent, wxWindowID id, const wxPoi
 	
 	
 	bSizer6->Add( bSizer8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
+	
+	m_staticline2 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	bSizer6->Add( m_staticline2, 0, wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxBoxSizer* bSizer7;
 	bSizer7 = new wxBoxSizer( wxHORIZONTAL );

@@ -23,13 +23,14 @@ GraylizeGUI::GraylizeGUI(wxWindow *parent, ImagePlugin *plug, wxWindowID id)
     { //================ Button group ====================
         wxSizer *plugctrl_sizer = new wxBoxSizer(wxHORIZONTAL);
 
-        wxButton *apply_btn = new wxButton(this, ID_APPLY, _("Apply"));
+        apply_btn = new wxButton(this, ID_APPLY, _("Apply"));
         plugctrl_sizer->Add(apply_btn, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
         plugctrl_sizer->Add(0, 0, 1, wxEXPAND, 5);
 
-        wxButton *cancel_btn = new wxButton(this, ID_CANCEL, _("Cancel"));
+        cancel_btn = new wxButton(this, ID_CANCEL, _("Cancel"));
         plugctrl_sizer->Add(cancel_btn, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+        cancel_btn->Disable();
 
         main_sizer->Add(plugctrl_sizer, 0, wxALL, 5);
     }
@@ -68,6 +69,7 @@ void GraylizeGUI::Excute() {
     } else
         gray>>result;
     SendImage(result);
+    cancel_btn->Enable();
 }
 
 void GraylizeGUI::OnApply(wxCommandEvent &event) {
@@ -76,6 +78,7 @@ void GraylizeGUI::OnApply(wxCommandEvent &event) {
 
 void GraylizeGUI::OnCancel(wxCommandEvent &event) {
     SendImage(origin);
+    cancel_btn->Disable();
 }
 
 DEFINE_PLUGIN_CREATOR(GraylizePlugin)

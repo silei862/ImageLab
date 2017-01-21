@@ -12,7 +12,7 @@ const wxString GreylizePane::FormatStr = "%.3f%%";
 GreylizePane::GreylizePane(wxWindow *parent, ImagePlugin *plug, wxWindowID id)
     :GreylizePaneBase(parent, id),
       ImagePluginAgent(plug){
-
+    cancelButton->Disable();
 }
 
 void GreylizePane::OnRedThumbRelease(wxScrollEvent &event)
@@ -75,7 +75,8 @@ void GreylizePane::OnRedCheckChanged(wxCommandEvent &event)
        blue_slider->Enable();
        green_check->SetValue(false);
        blue_check->SetValue(false);
-   }
+   } else
+       red_check->SetValue(true);
 }
 
 void GreylizePane::OnGreenCheckChanged(wxCommandEvent &event)
@@ -86,7 +87,8 @@ void GreylizePane::OnGreenCheckChanged(wxCommandEvent &event)
         blue_slider->Enable();
         red_check->SetValue(false);
         blue_check->SetValue(false);
-    }
+    } else
+        green_check->SetValue(true);
 }
 
 void GreylizePane::OnBlueCheckChanged(wxCommandEvent &event)
@@ -97,7 +99,8 @@ void GreylizePane::OnBlueCheckChanged(wxCommandEvent &event)
        green_slider->Enable();
        red_check->SetValue(false);
        green_check->SetValue(false);
-   }
+   } else
+       blue_check->SetValue(true);
 }
 
 void GreylizePane::GetSliderValue(int &r, int &g, int &b, int &max)
@@ -136,8 +139,8 @@ bool GreylizePane::LimitValue(int sum, int &active, int &passive)
 
 void GreylizePane::Convert()
 {
-    wxImage image = GetImage();
-    origin = image;
+    origin = GetImage();
+    wxImage image = origin.Copy();
     int w = image.GetWidth();
     int h = image.GetHeight();
     unsigned char *img_data = image.GetData();
@@ -165,6 +168,7 @@ void GreylizePane::Convert()
         eq_mat>>image;
     }
     SendImage(image);
+    cancelButton->Enable();
 }
 
 DEFINE_PLUGIN_CREATOR(GreylizePlugin)

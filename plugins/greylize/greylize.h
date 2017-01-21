@@ -16,7 +16,10 @@ public:
 
     void OnApply(wxCommandEvent &event) { RequestImage(); }
 
-    void OnCancel(wxCommandEvent &event) { SendImage(origin);}
+    void OnCancel(wxCommandEvent &event) {
+        SendImage(origin);
+        cancelButton->Disable();
+    }
 
     void OnRedThumbRelease(wxScrollEvent &event);
     void OnGreenThumbRelease(wxScrollEvent &event);

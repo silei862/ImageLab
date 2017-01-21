@@ -20,6 +20,7 @@ class ImageCanvas : public wxScrolled<wxWindow> {
         ID_FIT = wxID_HIGHEST,
         ID_ZOOMIN,
         ID_ZOOMOUT,
+        ID_ORIGIN,
     };
 
 public:
@@ -57,6 +58,7 @@ public:
     void OnFit(wxCommandEvent &event);
     void OnZoomIn(wxCommandEvent &event);
     void OnZoomOut(wxCommandEvent &event);
+    void OnOrigin(wxCommandEvent &event);
 
 private:
     // Draw image to screen:

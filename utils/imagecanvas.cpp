@@ -30,6 +30,7 @@ ImageCanvas::ImageCanvas(wxWindow *parent,
     menu->Append(ID_FIT, _("Fit"));
     menu->Append(ID_ZOOMIN,_("Zoom In"));
     menu->Append(ID_ZOOMOUT, _("Zoom Out"));
+    menu->Append(ID_ORIGIN, _("Origin Size"));
 
     Bind(wxEVT_PAINT, &ImageCanvas::OnPaint, this);
     Bind(wxEVT_MOUSEWHEEL, &ImageCanvas::OnMouseWheel, this);
@@ -40,6 +41,7 @@ ImageCanvas::ImageCanvas(wxWindow *parent,
     Bind(wxEVT_COMMAND_MENU_SELECTED, &ImageCanvas::OnFit, this, ID_FIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &ImageCanvas::OnZoomIn, this, ID_ZOOMIN);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &ImageCanvas::OnZoomOut, this, ID_ZOOMOUT);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &ImageCanvas::OnOrigin, this, ID_ORIGIN);
 }
 
 ImageCanvas::~ImageCanvas() {}
@@ -205,15 +207,20 @@ void ImageCanvas::OnMouseRightDown(wxMouseEvent &event) {
 
 void ImageCanvas::OnFit(wxCommandEvent &event) {
     FitSize();
-    Refresh();
+    UpdateCanvas();
 }
 
 void ImageCanvas::OnZoomIn(wxCommandEvent &event) {
     ZoomIn();
-    Refresh();
+    UpdateCanvas();
 }
 
 void ImageCanvas::OnZoomOut(wxCommandEvent &event) {
     ZoomOut();
-    Refresh();
+    UpdateCanvas();
+}
+
+void ImageCanvas::OnOrigin(wxCommandEvent &event) {
+    ScaleTo(scaleBase);
+    UpdateCanvas();
 }
