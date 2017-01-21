@@ -61,12 +61,17 @@ wxThread::ExitCode PluginLoader::Entry() {
     return wxThread::ExitCode(0);
 }
 
-void PluginManager::InitPlugin(wxEvtHandler *handler){
+void PluginManager::InitPlugin(wxWindow *parent, wxWindowID highest){
     if(!loader)
         return;
     for(auto creator : loader->creators) {
-        Plugin* plugin = (creator)(handler);
+        Plugin* plugin = (creator)(parent);
         plugins.push_back(plugin);
+    }
+
+    for(size_t index = 0; index < plugins.size(); index++ ) {
+        wxWindow *plugin_gui = plugins[index]->CreateGUI(parent, highest + index);
+        win_indexer[plugin_gui] = index;
     }
 }
 

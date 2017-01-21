@@ -140,9 +140,9 @@ inline void MainFrame::InitPanes() {
     toolbook->AddPage(about_pane,"About", true);
 
     //================================== Init Plugin GUIs =============================
-    plugin_mgr.InitPlugin(GetEventHandler());
+    plugin_mgr.InitPlugin(toolbook, ID_HIGHEST);
     for(size_t i = 0; i < plugin_mgr.GetPluginNum(); i++) {
-        wxWindow *plugin_gui = plugin_mgr[i]->GetWindow(toolbook, wxID_ANY);
+        wxWindow *plugin_gui = plugin_mgr.GetPluginGUI(i);
         toolbook->AddPage(plugin_gui, plugin_mgr[i]->GetPluginName(), true);
     }
 
@@ -183,8 +183,8 @@ inline void MainFrame::BindEvtProc() {
     Bind ( progrEVT_UPDATE, &MainFrame::OnProgressUpdate, this );
     Bind ( progrEVT_COMPLETE, &MainFrame::OnProgressComplete, this );
 
-    Bind ( plugEVT_IMAGE_REQUEST, &MainFrame::OnImageRequest, this);
-    Bind ( plugEVT_IMAGE, &MainFrame::OnImageUpdate, this);
+    Bind ( plugEVT_REQUEST_IMAGE, &MainFrame::OnImageRequest, this);
+    Bind ( plugEVT_NEW_IMAGE, &MainFrame::OnImageUpdate, this);
 }
 
 inline void MainFrame::LoadConfigs() {
@@ -319,21 +319,26 @@ void MainFrame::UpdateInfo ( bool update_tree )
 
 void MainFrame::OnImageRequest(wxCommandEvent &event) {
     ImageCanvas *canvas = dynamic_cast<ImageCanvas*>(imagebook->GetCurrentPage());
-    PluginGUI *plug_gui = dynamic_cast<PluginGUI*>(toolbook->GetCurrentPage());
-    if(!canvas || !plug_gui)
+    wxWindow *win = toolbook->GetCurrentPage();
+    if(!canvas || !win)
+        return;
+    ImagePlugin *plug = dynamic_cast<ImagePlugin*>(plugin_mgr[win]);
+    if(!plug)
         return;
     wxImage image = canvas->GetImage();
     if(!image.IsOk())
         return;
-    plugImageEvent evt;
-    evt.SetImage(image);
-    wxQueueEvent(plug_gui->GetPlugin(), evt.Clone());
+    plug->SetImage(image);
+    wxQueueEvent(plug, new wxCommandEvent(plugEVT_NEW_IMAGE));
 }
 
-void MainFrame::OnImageUpdate(plugImageEvent &event) {
+void MainFrame::OnImageUpdate(wxCommandEvent &event) {
     ImageCanvas *canvas = dynamic_cast<ImageCanvas*>(imagebook->GetCurrentPage());
-    if(!canvas)
+    wxWindow *win = toolbook->GetCurrentPage();
+    if(!canvas || !win)
         return;
-
-    canvas->SetImage(event.GetImage());
+    ImagePlugin *plug = dynamic_cast<ImagePlugin*>(plugin_mgr[win]);
+    wxImage image = plug->GetImage();
+    if(image.IsOk())
+        canvas->SetImage(image);
 }

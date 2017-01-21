@@ -6,26 +6,23 @@
 #include "plugin.h"
 
 wxDEFINE_EVENT(plugEVT_IMAGE, plugImageEvent);
-wxDEFINE_EVENT(plugEVT_IMAGE_REQUEST, wxCommandEvent);
-
-ImagePlugin::ImagePlugin(wxEvtHandler *hdl) {
-    handler = hdl;
-    Bind(plugEVT_IMAGE, &ImagePlugin::OnImageRecived, this);
-}
-
-void ImagePlugin::SetParentEvtHandler(wxEvtHandler *handler) {
-    this->handler = handler;
-}
+wxDEFINE_EVENT(plugEVT_REQUEST_IMAGE, wxCommandEvent);
+wxDEFINE_EVENT(plugEVT_NEW_IMAGE, wxCommandEvent);
 
 void ImagePlugin::RequestImage() {
     if(handler)
-        wxQueueEvent(handler, new wxCommandEvent(plugEVT_IMAGE_REQUEST));
+        wxQueueEvent(handler, new wxCommandEvent(plugEVT_REQUEST_IMAGE));
 }
 
-void ImagePlugin::SendImage(const wxImage &image) {
+void ImagePlugin::SendImageByEvent(const wxImage &image) {
     plugImageEvent event;
     event.SetImage(image);
     wxQueueEvent(handler, event.Clone());
+}
+
+void ImagePlugin::SendImage(const wxImage &img) {
+   image = img;
+   wxQueueEvent(handler, new wxCommandEvent(plugEVT_NEW_IMAGE));
 }
 
 void ImagePlugin::OnImageRecived(plugImageEvent &event) {
@@ -33,6 +30,8 @@ void ImagePlugin::OnImageRecived(plugImageEvent &event) {
     this->ImageRecived();
 }
 
-void ImagePlugin::ImageRecived() {
-
+void ImagePlugin::SetImage(const wxImage &img)
+{
+    image = img;
+    this->ImageRecived();
 }

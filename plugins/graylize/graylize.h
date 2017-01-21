@@ -5,24 +5,18 @@
 #ifndef GRAYLIZE_H
 #define GRAYLIZE_H
 
-class wxPanel;
-class wxAuiNotebook;
-class wxImage;
-
 #include <wx/wx.h>
 #include "plugin.h"
 
-class GraylizePlugin;
-
-class GraylizePane : public PluginGUI {
+class GraylizeGUI : public wxWindow, public ImagePluginAgent {
     enum _IDS {
         ID_APPLY = wxID_HIGHEST,
         ID_CANCEL,
     };
 
 public:
-    GraylizePane(wxWindow *parent, ImagePlugin *plug, wxWindowID id = wxID_ANY);
-    ~GraylizePane();
+    GraylizeGUI(wxWindow *parent, ImagePlugin *plug, wxWindowID id = wxID_ANY);
+    ~GraylizeGUI();
 
     void OnApply(wxCommandEvent &event);
     void OnCancel(wxCommandEvent &event);
@@ -38,15 +32,17 @@ class GraylizePlugin : public ImagePlugin {
 
 public:
     GraylizePlugin(wxEvtHandler* handler)
-        :ImagePlugin(handler),
-          pane(nullptr) { }
+        :ImagePlugin(handler, _("Graylize")), gui(nullptr){  }
 
-    virtual wxWindow* GetWindow(wxWindow *parent, wxWindowID id);
-    virtual wxString GetPluginName() { return wxString("Graylize"); }
-    virtual void ImageRecived();
+    virtual wxWindow *CreateGUI(wxWindow *parent, wxWindowID id = wxID_ANY) {
+        gui = new GraylizeGUI(parent, this, id);
+        return gui;
+    }
+    virtual wxWindow *GetGUI() const { return gui; }
+    virtual void ImageRecived() { gui->Excute(); }
 
 private:
-    GraylizePane *pane;
+    GraylizeGUI *gui;
 };
 
 #endif //GRAYLIZE_H

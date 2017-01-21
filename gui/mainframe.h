@@ -34,6 +34,8 @@ class MainFrame : public wxFrame {
 
 		ID_DIRCTRL,
         ID_GALLERY,
+
+        ID_HIGHEST
 	};
 	enum _CONST {
 		MIN_FRM_WIDTH = 1024,
@@ -82,7 +84,7 @@ public:
     void OnProgressComplete(wxCommandEvent &event);
 
     void OnImageRequest(wxCommandEvent &event);
-    void OnImageUpdate(plugImageEvent &event);
+    void OnImageUpdate(wxCommandEvent &event);
 
 //------------------------------------------------------------------
 private:

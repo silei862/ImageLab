@@ -8,6 +8,7 @@
 #include <wx/wx.h>
 #include <wx/dynlib.h>
 #include <wx/thread.h>
+#include <wx/hashmap.h>
 #include "plugin.h"
 
 wxDECLARE_EVENT(plugmgrEVT_LOADER_START, wxThreadEvent);
@@ -83,6 +84,8 @@ private:
 
 class PluginManager {
 
+WX_DECLARE_HASH_MAP( wxWindow* , size_t, wxPointerHash, wxPointerEqual, wxWin2int);
+
 public:
     PluginManager(PluginLoader *ldr = nullptr)
         :loader(ldr){
@@ -101,14 +104,31 @@ public:
         return loader;
     }
 
-    void InitPlugin(wxEvtHandler* handler);
+    void InitPlugin(wxWindow *parent, wxWindowID highest = 0);
+
+    wxWindow* GetPluginGUI(size_t index) const {
+        return plugins[index]->GetGUI();
+    }
+
+    size_t GetPluginWindowIndex( wxWindow *win) {
+        return win_indexer[win];
+    }
 
     Plugin* GetPlugin(size_t index) const {
         return plugins[index];
     }
 
+    Plugin* GetPlugin(wxWindow *win) {
+        size_t index = win_indexer[win];
+        return plugins[index];
+    }
+
     Plugin* operator[](size_t index) const {
         return plugins[index];
+    }
+
+    Plugin* operator[](wxWindow *win) {
+        return GetPlugin(win);
     }
 
     size_t GetPluginNum() const {
@@ -118,6 +138,7 @@ public:
 private:
     PluginLoader *loader;
     wxVector<Plugin*> plugins;
+    wxWin2int win_indexer;
 };
 
 #endif //PLUGMGR_H

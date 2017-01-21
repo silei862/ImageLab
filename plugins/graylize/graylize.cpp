@@ -11,8 +11,9 @@
 #include "graylize.h"
 
 
-GraylizePane::GraylizePane(wxWindow *parent, ImagePlugin *plug, wxWindowID id)
-    :PluginGUI(parent, plug, id){
+GraylizeGUI::GraylizeGUI(wxWindow *parent, ImagePlugin *plug, wxWindowID id)
+    :wxWindow(parent, id),
+      ImagePluginAgent(plug){
 
     wxSizer *main_sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -37,16 +38,16 @@ GraylizePane::GraylizePane(wxWindow *parent, ImagePlugin *plug, wxWindowID id)
     Layout();
 
     //====================Bind Event Proc==================
-    Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GraylizePane::OnApply, this, ID_APPLY);
-    Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GraylizePane::OnCancel, this, ID_CANCEL);
+    Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GraylizeGUI::OnApply, this, ID_APPLY);
+    Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GraylizeGUI::OnCancel, this, ID_CANCEL);
 }
 
-GraylizePane::~GraylizePane(){
+GraylizeGUI::~GraylizeGUI(){
 
 }
 
-void GraylizePane::Excute() {
-    origin = GetPlugin()->GetImage();
+void GraylizeGUI::Excute() {
+    origin = GetImage();
     //>>>>>> For debug
     if(!origin.IsOk()) {
         wxLogError("origin Image broken!");
@@ -66,24 +67,15 @@ void GraylizePane::Excute() {
         gray_eq>>result;
     } else
         gray>>result;
-    GetPlugin()->SendImage(result);
+    SendImage(result);
 }
 
-void GraylizePane::OnApply(wxCommandEvent &event) {
-    GetPlugin()->RequestImage();
+void GraylizeGUI::OnApply(wxCommandEvent &event) {
+    RequestImage();
 }
 
-void GraylizePane::OnCancel(wxCommandEvent &event) {
-    GetPlugin()->SendImage(origin);
+void GraylizeGUI::OnCancel(wxCommandEvent &event) {
+    SendImage(origin);
 }
 
 DEFINE_PLUGIN_CREATOR(GraylizePlugin)
-
-wxWindow* GraylizePlugin::GetWindow(wxWindow *parent, wxWindowID id) {
-    pane = new GraylizePane(parent, this, id);
-    return pane;
-}
-
-void GraylizePlugin::ImageRecived(){
-    pane->Excute();
-}

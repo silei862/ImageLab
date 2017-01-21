@@ -8,9 +8,11 @@
 #include <wx/wx.h>
 
 //======================= Image update event =============================
-wxDECLARE_EVENT(plugEVT_IMAGE_REQUEST, wxCommandEvent);
+wxDECLARE_EVENT(plugEVT_REQUEST_IMAGE, wxCommandEvent);
+wxDECLARE_EVENT(plugEVT_NEW_IMAGE, wxCommandEvent);
 
 class plugImageEvent;
+// event carry with image
 wxDECLARE_EVENT(plugEVT_IMAGE, plugImageEvent);
 
 class plugImageEvent : public wxCommandEvent {
@@ -45,7 +47,8 @@ typedef void (wxEvtHandler::*plugImageEventFunction)(plugImageEvent&);
 class Plugin : public wxEvtHandler {
 
 public:
-    virtual wxWindow* GetWindow(wxWindow *parent, wxWindowID id = wxID_ANY) = 0;
+    virtual wxWindow* CreateGUI(wxWindow *parent, wxWindowID id = wxID_ANY) = 0;
+    virtual wxWindow* GetGUI() const = 0;
     virtual void SetParentEvtHandler(wxEvtHandler *handler) = 0;
     virtual wxString GetPluginName() = 0;
 };
@@ -68,38 +71,44 @@ class ImagePlugin : public Plugin {
 
 public:
 
-    ImagePlugin(wxEvtHandler *hdl = nullptr);
+    ImagePlugin(wxEvtHandler *hdl = nullptr, const wxString &plug_name = _("ImagePlugin"))
+        :name(plug_name), handler(hdl) {
 
-    virtual wxWindow* GetWindow(wxWindow *parent, wxWindowID id = wxID_ANY ) = 0;
-    virtual void SetParentEvtHandler(wxEvtHandler *handler);
-    virtual wxString GetPluginName() = 0;
-    virtual void ImageRecived();
+        Bind(plugEVT_IMAGE, &ImagePlugin::OnImageRecived, this);
+    }
+
+    virtual wxWindow* CreateGUI(wxWindow *parent, wxWindowID id = wxID_ANY ) = 0;
+    virtual void ImageRecived() = 0;
+    virtual wxWindow* GetGUI() const = 0;
+
+    virtual void SetParentEvtHandler(wxEvtHandler *hdl){ handler = hdl;}
+    virtual wxString GetPluginName(){ return name; }
 
     wxImage GetImage() const { return image; }
+    void SetImage(const wxImage &img);
+
     void RequestImage();
     void SendImage(const wxImage &image);
+    void SendImageByEvent(const wxImage &image);
     void OnImageRecived(plugImageEvent &event);
+
+protected:
+    wxString name;
 
 private:
     wxImage image;
     wxEvtHandler *handler;
 };
 
-//=========================== Plugin GUI Base class =============================
-class PluginGUI : public wxWindow {
+class ImagePluginAgent {
 
 public:
-    PluginGUI(wxWindow *parent,
-              ImagePlugin* plug,
-              wxWindowID id = wxID_ANY,
-              const wxPoint pos = wxDefaultPosition,
-              const wxSize size = wxDefaultSize,
-              long style = 0,
-              const wxString name = wxPanelNameStr)
-        :wxWindow(parent, id, pos, size, style, name),
-          plugin(plug){ }
+    ImagePluginAgent(ImagePlugin *plug) :plugin(plug){ }
 
-    ImagePlugin* GetPlugin() const { return plugin; }
+    wxImage GetImage() const { return plugin->GetImage(); }
+    void RequestImage() { plugin->RequestImage(); }
+    void SendImage(const wxImage &image) { plugin->SendImage(image); }
+    void SendImageByEvent( const wxImage &image ) { plugin->SendImageByEvent(image); }
 
 private:
     ImagePlugin *plugin;

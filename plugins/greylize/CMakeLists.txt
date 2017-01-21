@@ -1,4 +1,4 @@
-set(PLUGIN_NAME "graylize")
+set(PLUGIN_NAME "greylize")
 aux_source_directory(. SRC_LIST)
 if(UNIX)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
