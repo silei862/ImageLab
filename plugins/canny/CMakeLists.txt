@@ -1,0 +1,13 @@
+set(PLUGIN_NAME "canny")
+aux_source_directory(. SRC_LIST)
+if(UNIX OR MINGW)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif(UNIX OR MINGW)
+
+include(${wxWidgets_USE_FILE})
+include_directories(${OpenCV_INCLUDE_DIRS} ../../plugmgr ../../utils )
+add_library(${PLUGIN_NAME} SHARED ${SRC_LIST})
+set_property(TARGET ${PLUGIN_NAME} PROPERTY CXX_STANDARD 11)
+set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "")
+target_link_libraries(${PLUGIN_NAME} utils plugmgr guictrl ${wxWidgets_LIBRARIES} ${OpenCV_LIBS})

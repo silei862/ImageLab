@@ -1,0 +1,11 @@
+set(EXE_NAME "imagelab")
+aux_source_directory(. SRC_LIST)
+
+include(${wxWidgets_USE_FILE})
+include_directories(${OpenCV_INCLUDE_DIRS} ../utils ../guictrl ../plugmgr)
+add_executable(${EXE_NAME} ${SRC_LIST})
+target_link_libraries(${EXE_NAME} utils guictrl plugmgr ${wxWidgets_LIBRARIES} ${OpenCV_LIBS})
+set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 11)
+if(MSVC)
+    set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:windows")
+endif(MSVC)
