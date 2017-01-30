@@ -1,4 +1,4 @@
-# PixeLab
+# ImageLab 
 整合OpenCv与wxWidgets尝试性小测试
 
 ### 1. 需要的支持库与版本
@@ -10,7 +10,7 @@
 ```bash
 mkdir build
 cd build
-cmake /path/to/PixeLab
+cmake /path/to/ImageLab
 make
 ```
 
@@ -18,7 +18,7 @@ make
 ```bash
 mkdir build
 cd build
-cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain/file
+cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain/file /path/to/ImageLab
 make
 ```
 ### 3.注意事项

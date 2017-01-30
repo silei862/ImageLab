@@ -37,7 +37,6 @@ private:
 //============================= Event handler ==================================
 public:
     //Main frame:
-    void OnMore(wxCommandEvent &event);
     void OnCloseFrame(wxCloseEvent &event);
     void OnImagePageChanged(wxAuiNotebookEvent &event);
     //File operation:

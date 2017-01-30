@@ -14,7 +14,7 @@ ResizeGUIBase::ResizeGUIBase( wxWindow* parent, wxWindowID id, const wxPoint& po
 	wxBoxSizer* bSizer11;
 	bSizer11 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText13 = new wxStaticText( this, wxID_ANY, wxT("更改图片大小"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText13 = new wxStaticText( this, wxID_ANY, wxT("图片尺寸"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText13->Wrap( -1 );
 	m_staticText13->SetFont( wxFont( 15, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	m_staticText13->SetForegroundColour( wxColour( 0, 55, 114 ) );

@@ -82,6 +82,7 @@ private:
 };
 
 class wxAuiNotebook;
+class wxAuiToolbar;
 
 class PluginManager {
 
@@ -104,6 +105,8 @@ public:
     }
 
     void InitPlugin(wxAuiNotebook *image_book);
+
+    void InitPluginPane(wxAuiNotebook *tool_book);
 
     IPlugin* GetPlugin(size_t index) const { return plugins[index]; }
 

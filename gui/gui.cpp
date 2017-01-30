@@ -49,111 +49,6 @@ MainFrameBase::MainFrameBase( wxWindow* parent, wxWindowID id, const wxString& t
 	tool_notebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_WINDOWLIST_BUTTON );
 	m_mgr.AddPane( tool_notebook, wxAuiPaneInfo() .Name( wxT("ToolNotebook") ).Right() .Caption( wxT("工具") ).CloseButton( false ).PinButton( true ).Dock().Resizable().FloatingSize( wxDefaultSize ).BottomDockable( false ).TopDockable( false ).MinSize( wxSize( 300,200 ) ) );
 	
-	basic_pane = new wxPanel( tool_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer3;
-	bSizer3 = new wxBoxSizer( wxVERTICAL );
-	
-	basic_book = new wxChoicebook( basic_pane, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
-	bSizer3->Add( basic_book, 1, wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
-	basic_pane->SetSizer( bSizer3 );
-	basic_pane->Layout();
-	bSizer3->Fit( basic_pane );
-	tool_notebook->AddPage( basic_pane, wxT("基本"), true, wxNullBitmap );
-	filter_pane = new wxPanel( tool_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer4;
-	bSizer4 = new wxBoxSizer( wxVERTICAL );
-	
-	filter_book = new wxChoicebook( filter_pane, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
-	bSizer4->Add( filter_book, 1, wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
-	filter_pane->SetSizer( bSizer4 );
-	filter_pane->Layout();
-	bSizer4->Fit( filter_pane );
-	tool_notebook->AddPage( filter_pane, wxT("滤波器"), false, wxNullBitmap );
-	edge_pane = new wxPanel( tool_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer5;
-	bSizer5 = new wxBoxSizer( wxVERTICAL );
-	
-	edge_book = new wxChoicebook( edge_pane, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
-	bSizer5->Add( edge_book, 1, wxEXPAND | wxALL, 5 );
-	
-	
-	edge_pane->SetSizer( bSizer5 );
-	edge_pane->Layout();
-	bSizer5->Fit( edge_pane );
-	tool_notebook->AddPage( edge_pane, wxT("边缘检测"), false, wxNullBitmap );
-	other_pane = new wxPanel( tool_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer12;
-	bSizer12 = new wxBoxSizer( wxVERTICAL );
-	
-	other_book = new wxChoicebook( other_pane, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
-	bSizer12->Add( other_book, 1, wxEXPAND | wxALL, 5 );
-	
-	
-	other_pane->SetSizer( bSizer12 );
-	other_pane->Layout();
-	bSizer12->Fit( other_pane );
-	tool_notebook->AddPage( other_pane, wxT("其他"), false, wxNullBitmap );
-	about_pane = new wxPanel( tool_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer10;
-	bSizer10 = new wxBoxSizer( wxVERTICAL );
-	
-	m_staticText5 = new wxStaticText( about_pane, wxID_ANY, wxT("图像实验室"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText5->Wrap( -1 );
-	m_staticText5->SetFont( wxFont( 15, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
-	m_staticText5->SetForegroundColour( wxColour( 26, 59, 93 ) );
-	
-	bSizer10->Add( m_staticText5, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 20 );
-	
-	m_staticText6 = new wxStaticText( about_pane, wxID_ANY, wxT("wxWidgets和OpenCV整合性测试程序，本软件遵循GPL v3协议；欢迎测试，期待您的宝贵意见。"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText6->Wrap( -1 );
-	bSizer10->Add( m_staticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 10 );
-	
-	more_button = new wxButton( about_pane, ID_MORE, wxT("更多信息..."), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer10->Add( more_button, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 15 );
-	
-	m_staticText7 = new wxStaticText( about_pane, wxID_ANY, wxT("特别感谢"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText7->Wrap( -1 );
-	m_staticText7->SetFont( wxFont( 13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
-	m_staticText7->SetForegroundColour( wxColour( 64, 64, 64 ) );
-	
-	bSizer10->Add( m_staticText7, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 15 );
-	
-	m_hyperlink6 = new wxHyperlinkCtrl( about_pane, wxID_ANY, wxT("wxWidgets"), wxT("http://www.wxwidgets.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer10->Add( m_hyperlink6, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_hyperlink7 = new wxHyperlinkCtrl( about_pane, wxID_ANY, wxT("OpenCV"), wxT("http://opencv.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer10->Add( m_hyperlink7, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_hyperlink8 = new wxHyperlinkCtrl( about_pane, wxID_ANY, wxT("QtCreator"), wxT("https://www.qt.io/ide/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer10->Add( m_hyperlink8, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_hyperlink9 = new wxHyperlinkCtrl( about_pane, wxID_ANY, wxT("wxFormbuilder"), wxT("http://www.wxformbuilder.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer10->Add( m_hyperlink9, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
-	bSizer10->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_staticText8 = new wxStaticText( about_pane, wxID_ANY, wxT("作者：滇中刀客"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText8->Wrap( -1 );
-	m_staticText8->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_SLANT, wxFONTWEIGHT_NORMAL, false, wxEmptyString ) );
-	
-	bSizer10->Add( m_staticText8, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_hyperlink11 = new wxHyperlinkCtrl( about_pane, wxID_ANY, wxT("github主页"), wxT("https://github.com/silei862/ImageLab"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer10->Add( m_hyperlink11, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_hyperlink10 = new wxHyperlinkCtrl( about_pane, wxID_ANY, wxT("silei862@gmail.com"), wxT("mailto:silei862@gmail.com"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer10->Add( m_hyperlink10, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
-	about_pane->SetSizer( bSizer10 );
-	about_pane->Layout();
-	bSizer10->Fit( about_pane );
-	tool_notebook->AddPage( about_pane, wxT("关于"), false, wxNullBitmap );
 	
 	info_ctrl = new wxInfoBar( this );
 	info_ctrl->SetShowHideEffects( wxSHOW_EFFECT_SLIDE_TO_RIGHT, wxSHOW_EFFECT_SLIDE_TO_RIGHT );
@@ -174,7 +69,6 @@ MainFrameBase::MainFrameBase( wxWindow* parent, wxWindowID id, const wxString& t
 	this->Connect( zoomin_tool->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( MainFrameBase::OnZoomIn ) );
 	this->Connect( fitsize_tool->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( MainFrameBase::OnFitSize ) );
 	img_notebook->Connect( wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, wxAuiNotebookEventHandler( MainFrameBase::OnImagePageChanged ), NULL, this );
-	more_button->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrameBase::OnMore ), NULL, this );
 }
 
 MainFrameBase::~MainFrameBase()
@@ -189,7 +83,6 @@ MainFrameBase::~MainFrameBase()
 	this->Disconnect( zoomin_tool->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( MainFrameBase::OnZoomIn ) );
 	this->Disconnect( fitsize_tool->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( MainFrameBase::OnFitSize ) );
 	img_notebook->Disconnect( wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, wxAuiNotebookEventHandler( MainFrameBase::OnImagePageChanged ), NULL, this );
-	more_button->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrameBase::OnMore ), NULL, this );
 	
 	m_mgr.UnInit();
 	
@@ -283,5 +176,75 @@ AboutDialogBase::~AboutDialogBase()
 {
 	// Disconnect Events
 	ok_button->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AboutDialogBase::OnOkButton ), NULL, this );
+	
+}
+
+AboutPanelBase::AboutPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxBoxSizer* bSizer10;
+	bSizer10 = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText5 = new wxStaticText( this, wxID_ANY, wxT("图像实验室"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText5->Wrap( -1 );
+	m_staticText5->SetFont( wxFont( 15, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
+	m_staticText5->SetForegroundColour( wxColour( 26, 59, 93 ) );
+	
+	bSizer10->Add( m_staticText5, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 20 );
+	
+	m_staticText6 = new wxStaticText( this, wxID_ANY, wxT("wxWidgets和OpenCV整合性测试程序，本软件遵循GPL v3协议；欢迎测试，期待您的宝贵意见。"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText6->Wrap( -1 );
+	m_staticText6->SetMinSize( wxSize( -1,80 ) );
+	
+	bSizer10->Add( m_staticText6, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 10 );
+	
+	more_button = new wxButton( this, ID_MORE, wxT("更多信息..."), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer10->Add( more_button, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 15 );
+	
+	m_staticText7 = new wxStaticText( this, wxID_ANY, wxT("特别感谢"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText7->Wrap( -1 );
+	m_staticText7->SetFont( wxFont( 13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
+	m_staticText7->SetForegroundColour( wxColour( 64, 64, 64 ) );
+	
+	bSizer10->Add( m_staticText7, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 15 );
+	
+	m_hyperlink6 = new wxHyperlinkCtrl( this, wxID_ANY, wxT("wxWidgets"), wxT("http://www.wxwidgets.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer10->Add( m_hyperlink6, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_hyperlink7 = new wxHyperlinkCtrl( this, wxID_ANY, wxT("OpenCV"), wxT("http://opencv.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer10->Add( m_hyperlink7, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_hyperlink8 = new wxHyperlinkCtrl( this, wxID_ANY, wxT("QtCreator"), wxT("https://www.qt.io/ide/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer10->Add( m_hyperlink8, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_hyperlink9 = new wxHyperlinkCtrl( this, wxID_ANY, wxT("wxFormbuilder"), wxT("http://www.wxformbuilder.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer10->Add( m_hyperlink9, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer10->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_staticText8 = new wxStaticText( this, wxID_ANY, wxT("作者：滇中刀客"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText8->Wrap( -1 );
+	m_staticText8->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_SLANT, wxFONTWEIGHT_NORMAL, false, wxEmptyString ) );
+	
+	bSizer10->Add( m_staticText8, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_hyperlink11 = new wxHyperlinkCtrl( this, wxID_ANY, wxT("github主页"), wxT("https://github.com/silei862/ImageLab"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer10->Add( m_hyperlink11, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_hyperlink10 = new wxHyperlinkCtrl( this, wxID_ANY, wxT("silei862@gmail.com"), wxT("mailto:silei862@gmail.com"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer10->Add( m_hyperlink10, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	this->SetSizer( bSizer10 );
+	this->Layout();
+	
+	// Connect Events
+	more_button->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AboutPanelBase::OnMore ), NULL, this );
+}
+
+AboutPanelBase::~AboutPanelBase()
+{
+	// Disconnect Events
+	more_button->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AboutPanelBase::OnMore ), NULL, this );
 	
 }

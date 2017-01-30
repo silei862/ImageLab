@@ -5,6 +5,7 @@
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/aui/auibook.h>
+#include <wx/choicebk.h>
 #include "plugmgr.h"
 
 wxDEFINE_EVENT(plugmgrEVT_LOADER_START, wxThreadEvent);
@@ -71,4 +72,17 @@ void PluginManager::InitPlugin(wxAuiNotebook* image_book){
     }
 }
 
+void PluginManager::InitPluginPane(wxAuiNotebook *tool_book)
+{
+    wxChoicebook* books[PLUG_MAXCATE];
+    for(int i = 0; i < PLUG_MAXCATE; i++){
+        books[i] = new wxChoicebook(tool_book, wxID_ANY);
+        tool_book->AddPage(books[i], PluginCategroyName[i]);
+    }
 
+    for(auto plugin : plugins) {
+        PluginCategroy cate = plugin->GetCategory();
+        wxWindow *gui = plugin->CreateGUI(books[cate]);
+        books[cate]->AddPage(gui, plugin->GetName());
+    }
+}

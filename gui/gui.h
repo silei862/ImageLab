@@ -22,17 +22,16 @@
 #include <wx/aui/aui.h>
 #include <wx/aui/auibar.h>
 #include <wx/aui/auibook.h>
-#include <wx/choicebk.h>
-#include <wx/sizer.h>
-#include <wx/panel.h>
-#include <wx/stattext.h>
-#include <wx/button.h>
-#include <wx/hyperlink.h>
 #include <wx/infobar.h>
 #include <wx/frame.h>
 #include <wx/bmpbuttn.h>
+#include <wx/button.h>
+#include <wx/sizer.h>
+#include <wx/panel.h>
 #include <wx/html/htmlwin.h>
 #include <wx/dialog.h>
+#include <wx/stattext.h>
+#include <wx/hyperlink.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -46,8 +45,7 @@ class MainFrameBase : public wxFrame
 	protected:
 		enum
 		{
-			ID_DIRCTRL = 1000,
-			ID_MORE
+			ID_DIRCTRL = 1000
 		};
 		
 		wxGenericDirCtrl* dir_ctrl;
@@ -61,26 +59,6 @@ class MainFrameBase : public wxFrame
 		wxAuiToolBarItem* fitsize_tool; 
 		wxAuiNotebook* img_notebook;
 		wxAuiNotebook* tool_notebook;
-		wxPanel* basic_pane;
-		wxChoicebook* basic_book;
-		wxPanel* filter_pane;
-		wxChoicebook* filter_book;
-		wxPanel* edge_pane;
-		wxChoicebook* edge_book;
-		wxPanel* other_pane;
-		wxChoicebook* other_book;
-		wxPanel* about_pane;
-		wxStaticText* m_staticText5;
-		wxStaticText* m_staticText6;
-		wxButton* more_button;
-		wxStaticText* m_staticText7;
-		wxHyperlinkCtrl* m_hyperlink6;
-		wxHyperlinkCtrl* m_hyperlink7;
-		wxHyperlinkCtrl* m_hyperlink8;
-		wxHyperlinkCtrl* m_hyperlink9;
-		wxStaticText* m_staticText8;
-		wxHyperlinkCtrl* m_hyperlink11;
-		wxHyperlinkCtrl* m_hyperlink10;
 		wxInfoBar* info_ctrl;
 		
 		// Virtual event handlers, overide them in your derived class
@@ -93,7 +71,6 @@ class MainFrameBase : public wxFrame
 		virtual void OnZoomIn( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFitSize( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnImagePageChanged( wxAuiNotebookEvent& event ) { event.Skip(); }
-		virtual void OnMore( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -161,6 +138,42 @@ class AboutDialogBase : public wxDialog
 		
 		AboutDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("关于..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION|wxCLOSE_BOX ); 
 		~AboutDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class AboutPanelBase
+///////////////////////////////////////////////////////////////////////////////
+class AboutPanelBase : public wxPanel 
+{
+	private:
+	
+	protected:
+		enum
+		{
+			ID_MORE = 1000
+		};
+		
+		wxStaticText* m_staticText5;
+		wxStaticText* m_staticText6;
+		wxButton* more_button;
+		wxStaticText* m_staticText7;
+		wxHyperlinkCtrl* m_hyperlink6;
+		wxHyperlinkCtrl* m_hyperlink7;
+		wxHyperlinkCtrl* m_hyperlink8;
+		wxHyperlinkCtrl* m_hyperlink9;
+		wxStaticText* m_staticText8;
+		wxHyperlinkCtrl* m_hyperlink11;
+		wxHyperlinkCtrl* m_hyperlink10;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnMore( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		AboutPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL ); 
+		~AboutPanelBase();
 	
 };
 

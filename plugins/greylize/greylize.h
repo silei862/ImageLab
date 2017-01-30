@@ -36,7 +36,7 @@ class GreylizePlugin : public Plugin {
 
 public:
     GreylizePlugin(wxAuiNotebook *image_book)
-        :Plugin(image_book, PLUG_BASIC, wxT("灰度化")) { }
+        :Plugin(image_book, PLUG_COLOR, wxT("灰度化")) { }
 
     wxWindow *CreateGUI(wxWindow *parent, wxWindowID id = wxID_ANY) {
         return new GreylizePane(parent, this, id);

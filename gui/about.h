@@ -14,4 +14,12 @@ public:
     void OnOkButton(wxCommandEvent &event);
 };
 
+class AboutPanel : public AboutPanelBase {
+public:
+    AboutPanel(wxWindow *parent, wxWindowID id = wxID_ANY);
+    ~AboutPanel() { }
+
+    void OnMore(wxCommandEvent &event);
+};
+
 #endif //ABOUTDIALOG_H

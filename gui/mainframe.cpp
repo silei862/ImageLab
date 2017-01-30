@@ -1,13 +1,14 @@
 #include <wx/config.h>
 #include <wx/filename.h>
 #include <wx/infobar.h>
+#include <wx/choicebk.h>
 #include <guievent.h>
 #include <imagecanvas.h>
 #include <progressbar.h>
 #include <plugmgr.h>
 #include "gallerypane.h"
 #include "mainframe.h"
-#include "aboutdialog.h"
+#include "about.h"
 
 MainFrame::MainFrame(wxWindow *parent, PluginLoader *loader, wxWindowID id)
     :MainFrameBase(parent, id), plugin_mgr(loader)
@@ -51,35 +52,10 @@ void MainFrame::InitPanes() {
 void MainFrame::InitPlugins()
 {
     plugin_mgr.InitPlugin(img_notebook);
+    plugin_mgr.InitPluginPane(tool_notebook);
 
-    for( size_t i = 0; i < plugin_mgr.GetPluginCount(); i++) {
-        PluginCategroy cate = plugin_mgr[i]->GetCategory();
-        wxString name = plugin_mgr[i]->GetName();
-        wxWindow *gui;
-
-        switch (cate) {
-        case PLUG_BASIC:
-            gui = plugin_mgr[i]->CreateGUI(basic_book);
-            basic_book->AddPage(gui, name);
-            break;
-        case PLUG_EDGEDETERCTOR:
-            gui = plugin_mgr[i]->CreateGUI(edge_book);
-            edge_book->AddPage(gui, name);
-            break;
-        case PLUG_FILTER:
-            gui = plugin_mgr[i]->CreateGUI(filter_book);
-            filter_book->AddPage(gui, name);
-            break;
-        case PLUG_OTHER:
-            gui = plugin_mgr[i]->CreateGUI(other_book);
-            other_book->AddPage(gui, name);
-            break;
-        default:
-            gui = plugin_mgr[i]->CreateGUI(other_book);
-            other_book->AddPage(gui, name);
-            break;
-        }
-    }
+    AboutPanel *pane = new AboutPanel(tool_notebook);
+    tool_notebook->AddPage(pane, wxT("关于"));
 }
 
 void MainFrame::BindEvents()
@@ -91,12 +67,6 @@ void MainFrame::BindEvents()
     Bind(progrEVT_COMPLETE, &MainFrame::OnProgressComplete, this);
 
     Bind(infoEVT_UPDATE, &MainFrame::OnInfoUpdate, this);
-}
-
-void MainFrame::OnMore(wxCommandEvent &event)
-{
-   AboutDialog *dlg = new AboutDialog(this);
-   dlg->Show();
 }
 
 void MainFrame::OnCloseFrame(wxCloseEvent &event)
@@ -216,14 +186,8 @@ void MainFrame::OnInfoUpdate(wxCommandEvent &event)
 
 wxWindow *MainFrame::GetCurrentPluginGUI()
 {
-    wxPanel *pane = dynamic_cast<wxPanel*>(tool_notebook->GetCurrentPage());
-    if(!pane)
+    wxChoicebook *book = dynamic_cast<wxChoicebook*>(tool_notebook->GetCurrentPage());
+    if(!book)
         return nullptr;
-    wxWindowListNode* node = pane->GetChildren().GetFirst();
-    if(!node)
-        return nullptr;
-    wxChoicebook *nb = dynamic_cast<wxChoicebook*>(node->GetData());
-    if(!nb)
-        return nullptr;
-    return nb->GetCurrentPage();
+    return book->GetCurrentPage();
 }

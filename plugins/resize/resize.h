@@ -31,7 +31,7 @@ class ResizePlugin : public Plugin {
 
 public:
     ResizePlugin(wxAuiNotebook *image_book)
-        :Plugin(image_book, PLUG_BASIC, wxT("更改图片大小")) { }
+        :Plugin(image_book, PLUG_BASIC, wxT("图片尺寸")) { }
 
     wxWindow* CreateGUI(wxWindow *parent, wxWindowID id) { return new ResizeGui(parent, this, id); }
 };

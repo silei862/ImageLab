@@ -5,13 +5,23 @@
 #include "wx_pch.h"
 
 enum PluginCategroy {
-    PLUG_OTHER = 0,
-    PLUG_BASIC,
+    PLUG_BASIC = 0,
+    PLUG_COLOR,
     PLUG_FILTER,
     PLUG_EDGEDETERCTOR,
+
+    PLUG_OTHER,
+    //Maxium Categroy
+    PLUG_MAXCATE
 };
 
-const static wxString Default_PluginName = wxT("插件");
+const static wxString PluginCategroyName[PLUG_MAXCATE] = {
+    wxT("基本"),
+    wxT("颜色"),
+    wxT("滤波器"),
+    wxT("边缘检测"),
+    wxT("其他")
+};
 
 class IPlugin {
 public:
@@ -34,6 +44,9 @@ class wxAuiNotebook;
 #define PLUGIN_CREATOR
     typedef IPlugin* (*PluginCreator)(wxAuiNotebook*);
 #endif //PLUGIN_CREATOR
+
+
+const static wxString Default_PluginName = wxT("插件");
 
 class Plugin : public IPlugin {
 
