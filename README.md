@@ -21,5 +21,7 @@ cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain/file /path/to/ImageLab
 make
 ```
-### 3.注意事项
-*由于安装部署还没有做,工程构建完成后，将plugins/graylize/graylize.so复制到gui/plugins下（plugins和主程序pixelab同一路径），否则插件不会载入*
+### 3. 运行
+```bash
+build/gui/imaglab
+```
